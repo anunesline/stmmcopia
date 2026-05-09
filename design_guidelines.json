@@ -1,0 +1,102 @@
+{
+  "theme": "Light",
+  "archetype": "Archetype 4 (Swiss & High-Contrast)",
+  "emotional_tone": "Professional, sterile, efficient, trustworthy, modern.",
+  "forbidden_elements": [
+    "Yellow color (strictly forbidden across the entire application)",
+    "Space Grotesk font (forbidden by E1 protocol)",
+    "Generic templates",
+    "Center-aligned everything"
+  ],
+  "typography": {
+    "heading_font": "Cabinet Grotesk",
+    "heading_fallback": "sans-serif",
+    "body_font": "Inter",
+    "body_fallback": "sans-serif",
+    "scales": {
+      "h1": "text-5xl lg:text-6xl tracking-tighter font-black",
+      "h2": "text-3xl lg:text-4xl tracking-tight font-bold",
+      "h3": "text-xl lg:text-2xl tracking-tight font-semibold",
+      "body": "text-base leading-relaxed",
+      "small_label": "text-xs uppercase tracking-[0.2em] font-semibold"
+    }
+  },
+  "colors": {
+    "primary": {
+      "DEFAULT": "#0B2861",
+      "foreground": "#FFFFFF",
+      "hover": "#1E3A8A"
+    },
+    "secondary": {
+      "DEFAULT": "#0EA5E9",
+      "foreground": "#FFFFFF",
+      "hover": "#0284C7"
+    },
+    "background": "#F8FAFC",
+    "surface": "#FFFFFF",
+    "surface_glass": "bg-white/70 backdrop-blur-xl border-white/40 border",
+    "text": {
+      "main": "#0F172A",
+      "muted": "#475569"
+    },
+    "border": "#E2E8F0"
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous Spacing (p-8 to p-12), Asymmetrical grids for visual interest, Grid borders for technical precision.",
+    "container_padding": "p-8",
+    "bento_grid": "grid-cols-1 md:grid-cols-12 gap-8"
+  },
+  "components": {
+    "hero": "Modern full-width with abstract blue textures or professional cleaning imagery overlay. Max overlay opacity bg-blue-900/40. Left-aligned heavy typography.",
+    "product_card": "Minimalist card with 1px border. Hover effect: subtle lift (-translate-y-1), drop-shadow-xl. Action button 'Add to Cart' appears on hover. Product image background should be pure white.",
+    "cart": "Shadcn Sheet component sliding from right. Must include item list, quantity adjusters, subtotal, and 'Proceed to Checkout' button.",
+    "checkout": "Multi-step flow. Clean, distraction-free environment. Input fields must use Shadcn forms with crisp borders. Include 'Coupon Code' input and display 'PJ Wholesale Discount' dynamically.",
+    "whatsapp_widget": "Floating action button fixed to bottom-right (z-50). Uses custom blue or neutral color (NOT yellow or green if it clashes with the brand, though green is standard for WhatsApp, user specified NO yellow, standard WhatsApp green #25D366 is allowed if it doesn't break the deep blue palette, else stick to blue).",
+    "badges": "Use sharp, high-contrast badges (e.g., bg-blue-900 text-white) for 'Atacado' (Wholesale) or 'Promo' labels."
+  },
+  "motion_and_interactions": {
+    "hover": "transition-all duration-300 ease-in-out",
+    "buttons": "hover:scale-[1.02] active:scale-[0.98]",
+    "page_transitions": "Framer Motion fade-in and slide-up for staggered grid elements."
+  },
+  "media": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1633259584604-afdc243122ea?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwzfHxibHVlJTIwYWJzdHJhY3QlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc3ODM1MDU4NXww&ixlib=rb-4.1.0&q=85",
+      "description": "Deep blue abstract background with wavy lines, perfect for a high-end corporate hero section overlay."
+    },
+    "product_placeholder_1": {
+      "url": "https://images.unsplash.com/photo-1626379481874-3dc5678fa8ca?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1NzZ8MHwxfHNlYXJjaHwyfHxjbGVhbmluZyUyMHByb2R1Y3RzfGVufDB8fHx8MTc3ODM1MDU5MHww&ixlib=rb-4.1.0&q=85",
+      "description": "White plastic cleaning bottles."
+    },
+    "product_placeholder_2": {
+      "url": "https://images.unsplash.com/photo-1550963295-019d8a8a61c5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHw0fHxzcHJheSUyMGJvdHRsZXxlbnwwfHx8fDE3NzgzNTA1ODl8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Clear spray bottle."
+    },
+    "product_placeholder_3": {
+      "url": "https://images.unsplash.com/photo-1632243575963-3143700087ed?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwxfHxzcHJheSUyMGJvdHRsZXxlbnwwfHx8fDE3NzgzNTA1ODl8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Spray bottle on a table."
+    },
+    "partner_logo_1": {
+      "url": "https://images.unsplash.com/photo-1654277040981-82984a49c63a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHw0fHxjb21wYW55JTIwbG9nbyUyMGJsdWUlMjB0cmFuc3BhcmVudHxlbnwwfHx8fDE3NzgzNTA1NjJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Corporate logo."
+    },
+    "partner_logo_2": {
+      "url": "https://images.unsplash.com/photo-1762340274481-73cde84f3374?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxjb21wYW55JTIwbG9nbyUyMGJsdWUlMjB0cmFuc3BhcmVudHxlbnwwfHx8fDE3NzgzNTA1NjJ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Professional logo variant."
+    }
+  },
+  "instructions_to_main_agent": [
+    "Install and use 'Cabinet Grotesk' for headings and 'Inter' for body.",
+    "Configure Tailwind with the exact colors provided. ABSOLUTELY NO YELLOW (#FFFF00, #FBBF24, etc.). Use semantic variables for primary and secondary.",
+    "Implement Google Social Login button on the Auth modal/page.",
+    "Create a toggle or distinct flow for 'Pessoa Física (PF)' and 'Pessoa Jurídica (PJ)' registration.",
+    "The shopping cart must be a sliding 'Sheet' component from Shadcn.",
+    "Implement a multi-step checkout with coupon validation and a fixed PJ wholesale discount dynamically calculated.",
+    "WhatsApp floating button must appear on all pages and trigger a chat interface that sends messages to a WhatsApp number.",
+    "Create an Admin Panel specific for managing Discount Coupons.",
+    "Highlight categories and product catalog using responsive CSS grids. Product cards must have an 'Atacado' badge if applicable.",
+    "Footer should include detailed contact information and links to policies.",
+    "DO NOT USE Space Grotesk. DO NOT USE Yellow.",
+    "All interactive elements MUST include a 'data-testid' attribute (e.g., data-testid='add-to-cart-button')."
+  ]
+}
