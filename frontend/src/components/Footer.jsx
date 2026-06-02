@@ -8,8 +8,12 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-12 grid md:grid-cols-3 gap-10">
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-11 h-11 rounded-lg bg-white flex items-center justify-center">
-              <span className="font-display text-[#0B2861] text-2xl">M</span>
+            <div className="bg-white p-2 rounded-lg">
+              <img
+                src="https://customer-assets.emergentagent.com/job_macro-supply-store/artifacts/z4sqbavk_1000115145_page-0001.jpg"
+                alt="MM Comércio e Distribuidora"
+                className="h-10 w-auto object-contain mix-blend-multiply"
+              />
             </div>
             <div>
               <div className="font-display text-lg">MM Comércio e Distribuidora</div>
@@ -21,10 +25,10 @@ export default function Footer() {
             de limpeza, descartáveis e papéis de qualidade.
           </p>
           <div className="flex gap-3 mt-5">
-            <a href="#" aria-label="Instagram" data-testid="footer-instagram" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#0EA5E9] flex items-center justify-center transition-colors">
+            <a href="https://www.instagram.com/redemmdistribuidoras" target="_blank" rel="noopener noreferrer" aria-label="Instagram" data-testid="footer-instagram" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#0EA5E9] flex items-center justify-center transition-colors">
               <Instagram className="w-4 h-4" />
             </a>
-            <a href="#" aria-label="Facebook" data-testid="footer-facebook" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#0EA5E9] flex items-center justify-center transition-colors">
+            <a href="https://www.facebook.com/redemmdistribuidoras" target="_blank" rel="noopener noreferrer" aria-label="Facebook" data-testid="footer-facebook" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#0EA5E9] flex items-center justify-center transition-colors">
               <Facebook className="w-4 h-4" />
             </a>
           </div>
@@ -44,8 +48,8 @@ export default function Footer() {
           <h4 className="text-xs uppercase tracking-[0.2em] text-sky-300 mb-4">Atendimento</h4>
           <ul className="space-y-3 text-sm text-slate-300">
             <li className="flex gap-2"><Phone className="w-4 h-4 text-sky-300 mt-0.5" /> (41) 3403-2999</li>
-            <li className="flex gap-2"><Clock className="w-4 h-4 text-sky-300 mt-0.5" /> Seg a Sex · 8h às 18h<br/><span className="ml-6 text-xs">Sábado · 8h às 12h</span></li>
-            <li className="flex gap-2"><MapPin className="w-4 h-4 text-sky-300 mt-0.5" /> Curitiba — PR</li>
+            <li className="flex gap-2"><Clock className="w-4 h-4 text-sky-300 mt-0.5" /> Seg a Sex · 9h às 18h<br/><span className="ml-6 text-xs">Sábado · 9h às 13h</span></li>
+            <li className="flex gap-2"><MapPin className="w-4 h-4 text-sky-300 mt-0.5" /> R. Rio Trombetas, 493 — Weissópolis, Pinhais — PR · 83322-280</li>
           </ul>
         </div>
       </div>

@@ -37,15 +37,17 @@ export default function Contact() {
                 <Clock className="w-5 h-5 text-[#7DD3FC] mt-0.5" />
                 <div>
                   <div className="text-[10px] uppercase tracking-[0.2em] text-sky-300 mb-1">Horário</div>
-                  <div>Segunda a sexta · 8h às 18h</div>
-                  <div>Sábado · 8h às 12h</div>
+                  <div>Segunda a sexta · 9h às 18h</div>
+                  <div>Sábado · 9h às 13h</div>
                 </div>
               </li>
               <li className="flex gap-3">
                 <MapPin className="w-5 h-5 text-[#7DD3FC] mt-0.5" />
                 <div>
                   <div className="text-[10px] uppercase tracking-[0.2em] text-sky-300 mb-1">Endereço</div>
-                  <div>Curitiba — Paraná</div>
+                  <div>R. Rio Trombetas, 493</div>
+                  <div>Weissópolis · Pinhais — PR</div>
+                  <div>CEP 83322-280</div>
                 </div>
               </li>
             </ul>
@@ -66,18 +68,16 @@ export default function Contact() {
         <div className="bg-white border border-slate-200 rounded-2xl p-8">
           <h2 className="font-display text-2xl text-[#0B2861] mb-4">Redes sociais</h2>
           <p className="text-sm text-slate-500 mb-6">Acompanhe lançamentos, promoções e dicas de limpeza profissional.</p>
-          <div className="grid grid-cols-3 gap-3">
-            <a href="#" data-testid="contact-instagram" className="flex flex-col items-center gap-2 border border-slate-200 rounded-xl p-5 hover:border-[#0EA5E9] hover:bg-slate-50 transition-all">
+          <div className="grid grid-cols-2 gap-3">
+            <a href="https://www.instagram.com/redemmdistribuidoras" target="_blank" rel="noopener noreferrer" data-testid="contact-instagram" className="flex flex-col items-center gap-2 border border-slate-200 rounded-xl p-5 hover:border-[#0EA5E9] hover:bg-slate-50 transition-all">
               <Instagram className="w-6 h-6 text-[#0B2861]" />
               <span className="text-xs font-medium">Instagram</span>
+              <span className="text-[10px] text-slate-500">@redemmdistribuidoras</span>
             </a>
-            <a href="#" data-testid="contact-facebook" className="flex flex-col items-center gap-2 border border-slate-200 rounded-xl p-5 hover:border-[#0EA5E9] hover:bg-slate-50 transition-all">
+            <a href="https://www.facebook.com/redemmdistribuidoras" target="_blank" rel="noopener noreferrer" data-testid="contact-facebook" className="flex flex-col items-center gap-2 border border-slate-200 rounded-xl p-5 hover:border-[#0EA5E9] hover:bg-slate-50 transition-all">
               <Facebook className="w-6 h-6 text-[#0B2861]" />
               <span className="text-xs font-medium">Facebook</span>
-            </a>
-            <a href="#" data-testid="contact-tiktok" className="flex flex-col items-center gap-2 border border-slate-200 rounded-xl p-5 hover:border-[#0EA5E9] hover:bg-slate-50 transition-all">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-[#0B2861]"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.85a8.16 8.16 0 0 0 4.77 1.52V6.93a4.85 4.85 0 0 1-1.84-.24z" /></svg>
-              <span className="text-xs font-medium">TikTok</span>
+              <span className="text-[10px] text-slate-500">@redemmdistribuidoras</span>
             </a>
           </div>
         </div>

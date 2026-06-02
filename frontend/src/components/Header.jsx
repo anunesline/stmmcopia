@@ -17,9 +17,11 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200" data-testid="site-header">
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between gap-6">
         <Link to="/" data-testid="logo-home" className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-lg bg-[#0B2861] flex items-center justify-center shadow-md">
-            <span className="font-display text-white text-2xl">M</span>
-          </div>
+          <img
+            src="https://customer-assets.emergentagent.com/job_macro-supply-store/artifacts/z4sqbavk_1000115145_page-0001.jpg"
+            alt="MM Comércio e Distribuidora"
+            className="h-12 w-auto object-contain mix-blend-multiply"
+          />
           <div className="leading-tight">
             <div className="font-display text-base sm:text-lg text-[#0B2861]">MM Comércio e Distribuidora</div>
             <div className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Limpeza · Descartáveis · Papéis</div>

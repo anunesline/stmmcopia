@@ -10,14 +10,14 @@ export default function About() {
         <span className="text-[#0EA5E9]">Limpeza · Descartáveis · Papéis</span>
       </h1>
       <p className="text-lg text-slate-600 leading-relaxed max-w-2xl mb-12">
-        Há mais de 20 anos atendendo empresas, condomínios, escolas e residências em Curitiba e região
-        com qualidade, preço justo e entrega rápida. Trabalhamos com as melhores marcas do mercado
-        e oferecemos atendimento próximo, direto pelo WhatsApp.
+        Há mais de 20 anos atendendo empresas, condomínios, escolas e residências em Pinhais, Curitiba
+        e região metropolitana com qualidade, preço justo e entrega rápida. Trabalhamos com as melhores
+        marcas do mercado e oferecemos atendimento próximo, direto pelo WhatsApp.
       </p>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {[
-          { icon: Truck, title: 'Entrega rápida', text: 'Cobertura em Curitiba e região metropolitana' },
+          { icon: Truck, title: 'Entrega rápida', text: 'Cobertura em Pinhais, Curitiba e região metropolitana' },
           { icon: HeartHandshake, title: 'Atendimento direto', text: 'Resposta rápida pelo WhatsApp' },
           { icon: ShieldCheck, title: 'Marcas certificadas', text: 'Linha profissional e hospitalar' },
           { icon: Award, title: '20+ anos', text: 'Confiança de quem já é cliente' },

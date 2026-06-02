@@ -28,7 +28,7 @@ export default function Home() {
           <div className="lg:col-span-7 space-y-6 animate-fade-up">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0EA5E9] animate-pulse" />
-              Curitiba · PR · Entrega para toda a região
+              Pinhais · PR · Entrega para toda a região
             </div>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[1.02]">
               Produtos de limpeza profissionais<br />
