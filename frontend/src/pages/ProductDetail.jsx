@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ShieldCheck, Truck, MessageCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { api } from '../lib/api';
+import { api, resolveImg } from '../lib/api';
 import { buildWhatsAppUrl } from '../components/WhatsAppWidget';
 
 export default function ProductDetail() {
@@ -28,7 +28,7 @@ export default function ProductDetail() {
 
       <div className="grid lg:grid-cols-2 gap-12">
         <div className="bg-white border border-slate-200 rounded-xl p-8 flex items-center justify-center">
-          <img src={p.image} alt={p.name} className="max-h-[480px] object-contain" />
+          <img src={resolveImg(p.image)} alt={p.name} className="max-h-[480px] object-contain" />
         </div>
 
         <div className="space-y-5">

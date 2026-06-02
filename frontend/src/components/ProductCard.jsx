@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { buildWhatsAppUrl } from './WhatsAppWidget';
+import { resolveImg } from '../lib/api';
 
 export default function ProductCard({ product, number = '554134032999' }) {
   const wppUrl = buildWhatsAppUrl({ number, product: product.name });
@@ -13,7 +14,7 @@ export default function ProductCard({ product, number = '554134032999' }) {
     >
       <div className="relative bg-slate-50 aspect-square overflow-hidden">
         <img
-          src={product.image}
+          src={resolveImg(product.image)}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />

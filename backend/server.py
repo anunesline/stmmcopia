@@ -1,13 +1,14 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends, Header, Cookie, UploadFile, File, Query
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-import os, logging, urllib.parse
+import os, logging, urllib.parse, uuid, httpx
 from pathlib import Path
 from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime, timezone
-import uuid
+from typing import Optional, Literal
+from datetime import datetime, timezone, timedelta
+
+from storage import init_storage, put_object, get_object, APP_NAME
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -15,6 +16,8 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+ADMIN_EMAILS = {e.strip().lower() for e in os.environ.get('ADMIN_EMAILS', '').split(',') if e.strip()}
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -27,16 +30,132 @@ class ChatMessage(BaseModel):
     message: str
     product: Optional[str] = None
 
-# ============ Catalog ============
+class ProductIn(BaseModel):
+    name: str
+    description: str
+    image: str
+    category: str
+    is_featured: bool = False
+
+class CategoryIn(BaseModel):
+    name: str
+    slug: str
+
+# ============ Auth ============
+
+async def get_current_user(
+    session_token: Optional[str] = Cookie(None),
+    authorization: Optional[str] = Header(None),
+):
+    token = session_token
+    if not token and authorization and authorization.startswith("Bearer "):
+        token = authorization.replace("Bearer ", "")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    session = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    expires_at = session["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=401, detail="Session expired")
+    user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
+
+async def require_admin(user: dict = Depends(get_current_user)):
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin only")
+    return user
+
+
+@api_router.post("/auth/session")
+async def auth_session(request: Request, response: Response):
+    body = await request.json()
+    session_id = body.get("session_id")
+    if not session_id:
+        raise HTTPException(status_code=400, detail="session_id required")
+    async with httpx.AsyncClient(timeout=10) as c:
+        r = await c.get(
+            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+            headers={"X-Session-ID": session_id},
+        )
+    if r.status_code != 200:
+        raise HTTPException(status_code=401, detail="Invalid session_id")
+    data = r.json()
+    email = data["email"].lower()
+    user_doc = await db.users.find_one({"email": email}, {"_id": 0})
+    is_admin = email in ADMIN_EMAILS
+    if not user_doc:
+        user_id = f"user_{uuid.uuid4().hex[:12]}"
+        user_doc = {
+            "user_id": user_id,
+            "email": email,
+            "name": data.get("name", ""),
+            "picture": data.get("picture"),
+            "is_admin": is_admin,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.users.insert_one(dict(user_doc))
+    else:
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {
+                "picture": data.get("picture"),
+                "name": data.get("name", user_doc.get("name", "")),
+                "is_admin": is_admin,
+            }},
+        )
+        user_doc["is_admin"] = is_admin
+    user_doc.pop("_id", None)
+    session_token = data["session_token"]
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    await db.user_sessions.insert_one({
+        "user_id": user_doc["user_id"],
+        "session_token": session_token,
+        "expires_at": expires_at.isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    response.set_cookie(
+        key="session_token", value=session_token,
+        max_age=7 * 24 * 60 * 60, httponly=True, secure=True, samesite="none", path="/",
+    )
+    return {"user": user_doc, "session_token": session_token}
+
+
+@api_router.get("/auth/me")
+async def auth_me(user: dict = Depends(get_current_user)):
+    return user
+
+
+@api_router.post("/auth/logout")
+async def auth_logout(
+    response: Response,
+    session_token: Optional[str] = Cookie(None),
+    authorization: Optional[str] = Header(None),
+):
+    token = session_token
+    if not token and authorization and authorization.startswith("Bearer "):
+        token = authorization.replace("Bearer ", "")
+    if token:
+        await db.user_sessions.delete_one({"session_token": token})
+    response.delete_cookie("session_token", path="/", samesite="none", secure=True)
+    return {"ok": True}
+
+# ============ Catalog (public) ============
 
 @api_router.get("/categories")
 async def list_categories():
-    items = await db.categories.find({}, {"_id": 0}).to_list(100)
+    items = await db.categories.find({}, {"_id": 0}).sort("name", 1).to_list(100)
     return items
 
 @api_router.get("/products")
 async def list_products(category: Optional[str] = None, featured: Optional[bool] = None,
-                        search: Optional[str] = None, limit: int = 60):
+                        search: Optional[str] = None, limit: int = 100):
     q = {}
     if category:
         q["category"] = category
@@ -54,7 +173,114 @@ async def get_product(product_id: str):
         raise HTTPException(status_code=404, detail="Product not found")
     return doc
 
-# ============ Settings ============
+# ============ Admin CRUD ============
+
+@api_router.post("/admin/products")
+async def create_product(payload: ProductIn, user: dict = Depends(require_admin)):
+    doc = {
+        "product_id": f"prod_{uuid.uuid4().hex[:10]}",
+        "name": payload.name,
+        "slug": payload.name.lower().replace(" ", "-"),
+        "description": payload.description,
+        "image": payload.image,
+        "category": payload.category,
+        "is_featured": payload.is_featured,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.products.insert_one(dict(doc))
+    doc.pop("_id", None)
+    return doc
+
+@api_router.put("/admin/products/{product_id}")
+async def update_product(product_id: str, payload: ProductIn, user: dict = Depends(require_admin)):
+    update = payload.model_dump()
+    update["slug"] = payload.name.lower().replace(" ", "-")
+    r = await db.products.update_one({"product_id": product_id}, {"$set": update})
+    if r.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    doc = await db.products.find_one({"product_id": product_id}, {"_id": 0})
+    return doc
+
+@api_router.delete("/admin/products/{product_id}")
+async def delete_product(product_id: str, user: dict = Depends(require_admin)):
+    await db.products.delete_one({"product_id": product_id})
+    return {"ok": True}
+
+@api_router.post("/admin/categories")
+async def create_category(payload: CategoryIn, user: dict = Depends(require_admin)):
+    slug = payload.slug.lower().strip()
+    if await db.categories.find_one({"slug": slug}):
+        raise HTTPException(status_code=400, detail="Categoria já existe")
+    doc = {
+        "category_id": f"cat_{uuid.uuid4().hex[:8]}",
+        "name": payload.name,
+        "slug": slug,
+        "icon": "Sparkles",
+    }
+    await db.categories.insert_one(dict(doc))
+    doc.pop("_id", None)
+    return doc
+
+@api_router.put("/admin/categories/{category_id}")
+async def update_category(category_id: str, payload: CategoryIn, user: dict = Depends(require_admin)):
+    update = {"name": payload.name, "slug": payload.slug.lower().strip()}
+    r = await db.categories.update_one({"category_id": category_id}, {"$set": update})
+    if r.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Category not found")
+    doc = await db.categories.find_one({"category_id": category_id}, {"_id": 0})
+    return doc
+
+@api_router.delete("/admin/categories/{category_id}")
+async def delete_category(category_id: str, user: dict = Depends(require_admin)):
+    await db.categories.delete_one({"category_id": category_id})
+    return {"ok": True}
+
+# ============ Upload ============
+
+MIME_TYPES = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
+              "gif": "image/gif", "webp": "image/webp"}
+
+@api_router.post("/admin/upload")
+async def upload(file: UploadFile = File(...), user: dict = Depends(require_admin)):
+    ext = (file.filename.rsplit(".", 1)[-1] if "." in file.filename else "bin").lower()
+    if ext not in MIME_TYPES:
+        raise HTTPException(status_code=400, detail="Tipo de imagem inválido")
+    content_type = MIME_TYPES[ext]
+    data = await file.read()
+    if len(data) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Arquivo muito grande (máx 10MB)")
+    file_id = uuid.uuid4().hex
+    path = f"{APP_NAME}/products/{file_id}.{ext}"
+    result = put_object(path, data, content_type)
+    record_id = str(uuid.uuid4())
+    await db.files.insert_one({
+        "id": record_id,
+        "storage_path": result["path"],
+        "original_filename": file.filename,
+        "content_type": content_type,
+        "size": result.get("size", len(data)),
+        "is_deleted": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    # Public URL via our backend serves the file
+    backend_url = os.environ.get("PUBLIC_BACKEND_URL", "")
+    public_url = f"/api/files/{result['path']}"
+    return {"url": public_url, "path": result["path"], "size": result.get("size", len(data))}
+
+
+@api_router.get("/files/{path:path}")
+async def serve_file(path: str):
+    record = await db.files.find_one({"storage_path": path, "is_deleted": False}, {"_id": 0})
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    data, content_type = get_object(path)
+    return Response(
+        content=data,
+        media_type=record.get("content_type", content_type),
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+# ============ Settings & WhatsApp ============
 
 @api_router.get("/settings")
 async def get_settings():
@@ -63,7 +289,6 @@ async def get_settings():
         return {"whatsapp_number": "554134032999"}
     return {"whatsapp_number": doc.get("whatsapp_number", "554134032999")}
 
-# ============ WhatsApp ============
 
 @api_router.post("/chat/whatsapp")
 async def chat_whatsapp(payload: ChatMessage):
@@ -71,10 +296,8 @@ async def chat_whatsapp(payload: ChatMessage):
     number = settings_doc.get("whatsapp_number", "554134032999")
     doc = {
         "message_id": f"msg_{uuid.uuid4().hex[:10]}",
-        "name": payload.name,
-        "phone": payload.phone,
-        "message": payload.message,
-        "product": payload.product,
+        "name": payload.name, "phone": payload.phone,
+        "message": payload.message, "product": payload.product,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.chat_messages.insert_one(dict(doc))
@@ -90,20 +313,11 @@ async def chat_whatsapp(payload: ChatMessage):
     url = f"https://wa.me/{number}?text={urllib.parse.quote(full)}"
     return {"whatsapp_url": url, "number": number}
 
-# ============ Seed Data ============
+# ============ Seed ============
 
 async def seed_data():
     if not await db.settings.find_one({"key": "global"}):
-        await db.settings.insert_one({
-            "key": "global",
-            "whatsapp_number": "554134032999",
-        })
-    else:
-        await db.settings.update_one(
-            {"key": "global"},
-            {"$set": {"whatsapp_number": "554134032999"}},
-        )
-
+        await db.settings.insert_one({"key": "global", "whatsapp_number": "554134032999"})
     categories = [
         {"category_id": "cat_limpeza", "name": "Limpeza Geral", "slug": "limpeza-geral", "icon": "Sparkles"},
         {"category_id": "cat_descartaveis", "name": "Descartáveis", "slug": "descartaveis", "icon": "Package"},
@@ -111,58 +325,39 @@ async def seed_data():
         {"category_id": "cat_higiene", "name": "Higiene", "slug": "higiene", "icon": "Droplets"},
     ]
     for c in categories:
-        await db.categories.update_one({"category_id": c["category_id"]}, {"$set": c}, upsert=True)
-    # Remove obsolete categories
-    valid_ids = [c["category_id"] for c in categories]
-    await db.categories.delete_many({"category_id": {"$nin": valid_ids}})
-
-    # Reset products to Azulim line + complements
-    await db.products.delete_many({})
-
-    azulim_perfumado = "https://images.unsplash.com/photo-1585421514738-01798e348b17?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
-    azulim_vidros = "https://images.unsplash.com/photo-1563453392212-326f5e854473?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
-    azulim_multi = "https://images.unsplash.com/photo-1583947215259-38e31be8751f?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
-    azulim_desinf = "https://images.unsplash.com/photo-1626379481874-3dc5678fa8ca?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
-    azulim_louca = "https://images.unsplash.com/photo-1581622558663-b2e33377dfb2?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
-    descart_img = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
-    papel_img = "https://images.unsplash.com/photo-1563456102060-9c0dfc1f4b3a?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
-
-    products = [
-        {"name": "Azulim Limpador Perfumado", "category": "limpeza-geral", "image": azulim_perfumado, "is_featured": True,
-         "description": "Limpador perfumado Azulim — fragrância marcante e ação prolongada. Ideal para pisos, superfícies e ambientes."},
-        {"name": "Azulim Limpa Vidros", "category": "limpeza-geral", "image": azulim_vidros, "is_featured": True,
-         "description": "Limpa vidros Azulim — alto brilho, sem manchas, evapora rapidamente."},
-        {"name": "Azulim Multiuso", "category": "limpeza-geral", "image": azulim_multi, "is_featured": True,
-         "description": "Multiuso Azulim — limpa, desengordura e perfuma diversas superfícies."},
-        {"name": "Azulim Desinfetante Super Concentrado", "category": "higiene", "image": azulim_desinf, "is_featured": True,
-         "description": "Desinfetante super concentrado Azulim — ação bactericida prolongada, rendimento superior."},
-        {"name": "Azulim Lava Louças", "category": "limpeza-geral", "image": azulim_louca, "is_featured": True,
-         "description": "Lava-louças Azulim — alta concentração, espuma rica e perfume agradável."},
-        {"name": "Saco de Lixo Reforçado 100L", "category": "descartaveis", "image": descart_img,
-         "description": "Saco de lixo reforçado, alta resistência, embalagem com 100 unidades."},
-        {"name": "Luva Descartável Nitrílica", "category": "descartaveis", "image": descart_img,
-         "description": "Luva nitrílica descartável sem pó, caixa com 100 unidades."},
-        {"name": "Papel Toalha Interfolhado", "category": "papeis", "image": papel_img,
-         "description": "Papel toalha interfolhado branco luxo, fardo com 1000 folhas."},
-        {"name": "Papel Higiênico Profissional 300m", "category": "papeis", "image": papel_img,
-         "description": "Papel higiênico folha dupla 300m, ideal para uso comercial."},
-    ]
-    for i, p in enumerate(products):
-        doc = {
-            "product_id": f"prod_{i+1:03d}",
-            "name": p["name"],
-            "slug": p["name"].lower().replace(" ", "-"),
-            "description": p["description"],
-            "image": p["image"],
-            "category": p["category"],
-            "is_featured": p.get("is_featured", False),
-        }
-        await db.products.insert_one(dict(doc))
+        await db.categories.update_one({"category_id": c["category_id"]}, {"$setOnInsert": c}, upsert=True)
+    # Only seed products if collection is empty
+    count = await db.products.count_documents({})
+    if count == 0:
+        azulim_perfumado = "https://images.unsplash.com/photo-1585421514738-01798e348b17?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
+        azulim_vidros = "https://images.unsplash.com/photo-1563453392212-326f5e854473?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
+        azulim_multi = "https://images.unsplash.com/photo-1583947215259-38e31be8751f?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
+        azulim_desinf = "https://images.unsplash.com/photo-1626379481874-3dc5678fa8ca?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
+        azulim_louca = "https://images.unsplash.com/photo-1581622558663-b2e33377dfb2?crop=entropy&cs=srgb&fm=jpg&w=700&q=85"
+        products = [
+            ("Azulim Limpador Perfumado", "limpeza-geral", azulim_perfumado, True, "Limpador perfumado Azulim — fragrância marcante e ação prolongada."),
+            ("Azulim Limpa Vidros", "limpeza-geral", azulim_vidros, True, "Limpa vidros Azulim — alto brilho, sem manchas."),
+            ("Azulim Multiuso", "limpeza-geral", azulim_multi, True, "Multiuso Azulim — limpa, desengordura e perfuma."),
+            ("Azulim Desinfetante Super Concentrado", "higiene", azulim_desinf, True, "Desinfetante super concentrado Azulim — ação bactericida prolongada."),
+            ("Azulim Lava Louças", "limpeza-geral", azulim_louca, True, "Lava-louças Azulim — alta concentração, espuma rica."),
+        ]
+        for i, (name, cat, img, feat, desc) in enumerate(products):
+            await db.products.insert_one({
+                "product_id": f"prod_{i+1:03d}", "name": name,
+                "slug": name.lower().replace(" ", "-"),
+                "description": desc, "image": img, "category": cat,
+                "is_featured": feat,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
 
 
 @app.on_event("startup")
 async def on_startup():
     await seed_data()
+    try:
+        init_storage()
+    except Exception as e:
+        logging.warning(f"Storage init failed (will retry on first upload): {e}")
 
 
 app.include_router(api_router)
