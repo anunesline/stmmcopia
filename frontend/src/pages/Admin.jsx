@@ -246,15 +246,26 @@ export default function Admin() {
                   </button>
                 </div>
               )}
-              <label className="block">
-                <span className="sr-only">Upload</span>
-                <input type="file" accept="image/*" onChange={onUpload} disabled={uploading} className="hidden" id="upload-input" data-testid="upload-input" />
-                <Button asChild variant="outline" className="gap-2 cursor-pointer w-fit">
-                  <label htmlFor="upload-input" className="cursor-pointer">
-                    <Upload className="w-4 h-4" /> {uploading ? 'Enviando...' : (form.image ? 'Trocar foto' : 'Enviar foto')}
-                  </label>
-                </Button>
-              </label>
+              <div className="space-y-2">
+                <label className="block">
+                  <input type="file" accept="image/*" onChange={onUpload} disabled={uploading} className="hidden" id="upload-input" data-testid="upload-input" />
+                  <Button asChild variant="outline" className="gap-2 cursor-pointer w-fit">
+                    <label htmlFor="upload-input" className="cursor-pointer">
+                      <Upload className="w-4 h-4" /> {uploading ? 'Enviando...' : (form.image ? 'Trocar foto (upload)' : 'Enviar foto do PC')}
+                    </label>
+                  </Button>
+                </label>
+                <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-slate-400">
+                  <div className="flex-1 h-px bg-slate-200" /> ou cole uma URL <div className="flex-1 h-px bg-slate-200" />
+                </div>
+                <Input
+                  data-testid="form-image-url"
+                  type="url"
+                  value={form.image && (form.image.startsWith('http://') || form.image.startsWith('https://')) ? form.image : ''}
+                  onChange={(e) => setForm({ ...form, image: e.target.value })}
+                  placeholder="https://exemplo.com/foto.jpg"
+                />
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <Switch checked={form.is_featured} onCheckedChange={(v) => setForm({ ...form, is_featured: v })} data-testid="form-featured" />
