@@ -21,8 +21,7 @@ export default function Contact() {
       </p>
 
       <div className="grid lg:grid-cols-2 gap-8">
-        <div className="bg-[#0B2861] text-white rounded-2xl p-8 relative overflow-hidden">
-          <div className="absolute inset-0 grid-lines opacity-30" />
+        <div className="bg-[#0B2861] text-white rounded-2xl p-8 relative overflow-hidden">          <div className="absolute inset-0 grid-lines opacity-30" />
           <div className="relative">
             <h2 className="font-display text-2xl mb-6">Atendimento direto</h2>
             <ul className="space-y-5 text-sm">
@@ -81,6 +80,34 @@ export default function Contact() {
             </a>
           </div>
         </div>
+      </div>
+
+      {/* Map */}
+      <div className="mt-10" data-testid="map-section">
+        <div className="text-xs uppercase tracking-[0.25em] text-[#0EA5E9] font-semibold mb-3">Como chegar</div>
+        <h2 className="font-display text-2xl sm:text-3xl text-[#0B2861] mb-5">Nossa loja física</h2>
+        <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+          <iframe
+            data-testid="google-map"
+            title="MM Comércio e Distribuidora — R. Rio Trombetas, 493, Pinhais — PR"
+            src="https://www.google.com/maps?q=R.+Rio+Trombetas,+493+-+Weiss%C3%B3polis,+Pinhais+-+PR,+83322-280&output=embed"
+            width="100%"
+            height="420"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+        <a
+          href="https://www.google.com/maps/dir/?api=1&destination=R.+Rio+Trombetas,+493+-+Weiss%C3%B3polis,+Pinhais+-+PR,+83322-280"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="open-maps-btn"
+          className="inline-flex items-center gap-2 mt-4 text-sm text-[#0B2861] underline underline-offset-4 hover:text-[#0EA5E9]"
+        >
+          <MapPin className="w-4 h-4" /> Traçar rota no Google Maps
+        </a>
       </div>
     </div>
   );
