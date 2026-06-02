@@ -24,13 +24,14 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  useEffect(() => {
-    if (window.location.hash?.includes('session_id=')) {
-      setLoading(false);
-      return;
-    }
-    checkAuth();
-  }, [checkAuth]);
+  useEffect(() => { checkAuth(); }, [checkAuth]);
+
+  const login = async (email, password) => {
+    const r = await api.post('/auth/login', { email, password });
+    localStorage.setItem('mm_token', r.data.session_token);
+    setUser(r.data.user);
+    return r.data.user;
+  };
 
   const logout = async () => {
     try { await api.post('/auth/logout'); } catch {}
@@ -39,14 +40,8 @@ export function AuthProvider({ children }) {
     window.location.href = '/';
   };
 
-  // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-  const loginWithGoogle = () => {
-    const redirectUrl = window.location.origin + '/admin';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-  };
-
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, checkAuth, logout, loginWithGoogle }}>
+    <AuthContext.Provider value={{ user, setUser, loading, checkAuth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

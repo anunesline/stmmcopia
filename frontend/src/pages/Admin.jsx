@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 const EMPTY = { name: '', description: '', image: '', category: '', is_featured: false };
 
 export default function Admin() {
-  const { user, loading, loginWithGoogle, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [editing, setEditing] = useState(null);
@@ -37,30 +37,7 @@ export default function Admin() {
 
   if (loading) return <div className="max-w-3xl mx-auto px-4 py-20 text-center text-slate-500">Carregando...</div>;
 
-  if (!user) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center" data-testid="admin-login-page">
-        <div className="w-16 h-16 mx-auto rounded-full bg-[#0B2861] flex items-center justify-center mb-5">
-          <ShieldCheck className="w-7 h-7 text-white" />
-        </div>
-        <h1 className="font-display text-3xl text-[#0B2861] mb-3">Área administrativa</h1>
-        <p className="text-slate-500 mb-6">Faça login com Google para gerenciar produtos e categorias.</p>
-        <Button data-testid="admin-login-btn" onClick={loginWithGoogle} className="bg-[#0B2861] hover:bg-[#1E3A8A] h-11 px-8">
-          Entrar com Google
-        </Button>
-      </div>
-    );
-  }
-
-  if (!user.is_admin) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center" data-testid="admin-denied">
-        <h1 className="font-display text-3xl text-[#0B2861] mb-3">Acesso restrito</h1>
-        <p className="text-slate-500 mb-6">A conta <span className="font-mono">{user.email}</span> não tem permissão de administrador.</p>
-        <Button onClick={logout} variant="outline">Sair</Button>
-      </div>
-    );
-  }
+  if (!user || !user.is_admin) return null; // handled by RequireAuth
 
   const openNew = () => { setEditing(null); setForm(EMPTY); setOpen(true); };
   const openEdit = (p) => {

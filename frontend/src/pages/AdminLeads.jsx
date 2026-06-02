@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
 export default function AdminLeads() {
-  const { user, loading, loginWithGoogle } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [leads, setLeads] = useState([]);
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -35,12 +35,7 @@ export default function AdminLeads() {
   if (loading) return <div className="max-w-3xl mx-auto px-4 py-20 text-center text-slate-500">Carregando...</div>;
 
   if (!user) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center" data-testid="leads-login-page">
-        <h1 className="font-display text-3xl text-[#0B2861] mb-3">Área administrativa</h1>
-        <Button onClick={loginWithGoogle} className="bg-[#0B2861] hover:bg-[#1E3A8A] h-11 px-8">Entrar com Google</Button>
-      </div>
-    );
+    return null; // handled by RequireAuth
   }
 
   if (!user.is_admin) {

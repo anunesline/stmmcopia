@@ -4,11 +4,12 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os, logging, urllib.parse, uuid, httpx
 from pathlib import Path
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional, Literal
 from datetime import datetime, timezone, timedelta
 
 from storage import init_storage, put_object, get_object, APP_NAME
+from auth import create_token, decode_token, verify_password, seed_admin
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -30,6 +31,11 @@ class ChatMessage(BaseModel):
     message: str
     product: Optional[str] = None
 
+
+class LoginIn(BaseModel):
+    email: str
+    password: str
+
 class ProductIn(BaseModel):
     name: str
     description: str
@@ -44,25 +50,13 @@ class CategoryIn(BaseModel):
 # ============ Auth ============
 
 async def get_current_user(
-    session_token: Optional[str] = Cookie(None),
     authorization: Optional[str] = Header(None),
 ):
-    token = session_token
-    if not token and authorization and authorization.startswith("Bearer "):
-        token = authorization.replace("Bearer ", "")
-    if not token:
+    if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Not authenticated")
-    session = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
-    if not session:
-        raise HTTPException(status_code=401, detail="Invalid session")
-    expires_at = session["expires_at"]
-    if isinstance(expires_at, str):
-        expires_at = datetime.fromisoformat(expires_at)
-    if expires_at.tzinfo is None:
-        expires_at = expires_at.replace(tzinfo=timezone.utc)
-    if expires_at < datetime.now(timezone.utc):
-        raise HTTPException(status_code=401, detail="Session expired")
-    user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0})
+    token = authorization.replace("Bearer ", "")
+    payload = decode_token(token)
+    user = await db.users.find_one({"user_id": payload["sub"]}, {"_id": 0, "password_hash": 0})
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     return user
@@ -73,58 +67,15 @@ async def require_admin(user: dict = Depends(get_current_user)):
     return user
 
 
-@api_router.post("/auth/session")
-async def auth_session(request: Request, response: Response):
-    body = await request.json()
-    session_id = body.get("session_id")
-    if not session_id:
-        raise HTTPException(status_code=400, detail="session_id required")
-    async with httpx.AsyncClient(timeout=10) as c:
-        r = await c.get(
-            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
-            headers={"X-Session-ID": session_id},
-        )
-    if r.status_code != 200:
-        raise HTTPException(status_code=401, detail="Invalid session_id")
-    data = r.json()
-    email = data["email"].lower()
-    user_doc = await db.users.find_one({"email": email}, {"_id": 0})
-    is_admin = email in ADMIN_EMAILS
-    if not user_doc:
-        user_id = f"user_{uuid.uuid4().hex[:12]}"
-        user_doc = {
-            "user_id": user_id,
-            "email": email,
-            "name": data.get("name", ""),
-            "picture": data.get("picture"),
-            "is_admin": is_admin,
-            "created_at": datetime.now(timezone.utc).isoformat(),
-        }
-        await db.users.insert_one(dict(user_doc))
-    else:
-        await db.users.update_one(
-            {"email": email},
-            {"$set": {
-                "picture": data.get("picture"),
-                "name": data.get("name", user_doc.get("name", "")),
-                "is_admin": is_admin,
-            }},
-        )
-        user_doc["is_admin"] = is_admin
-    user_doc.pop("_id", None)
-    session_token = data["session_token"]
-    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
-    await db.user_sessions.insert_one({
-        "user_id": user_doc["user_id"],
-        "session_token": session_token,
-        "expires_at": expires_at.isoformat(),
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    })
-    response.set_cookie(
-        key="session_token", value=session_token,
-        max_age=7 * 24 * 60 * 60, httponly=True, secure=True, samesite="none", path="/",
-    )
-    return {"user": user_doc, "session_token": session_token}
+@api_router.post("/auth/login")
+async def auth_login(payload: LoginIn):
+    email = payload.email.lower().strip()
+    user = await db.users.find_one({"email": email})
+    if not user or not verify_password(payload.password, user.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="E-mail ou senha inválidos")
+    token = create_token(user["user_id"], user["email"])
+    user_safe = {k: v for k, v in user.items() if k not in ("_id", "password_hash")}
+    return {"user": user_safe, "session_token": token}
 
 
 @api_router.get("/auth/me")
@@ -133,17 +84,8 @@ async def auth_me(user: dict = Depends(get_current_user)):
 
 
 @api_router.post("/auth/logout")
-async def auth_logout(
-    response: Response,
-    session_token: Optional[str] = Cookie(None),
-    authorization: Optional[str] = Header(None),
-):
-    token = session_token
-    if not token and authorization and authorization.startswith("Bearer "):
-        token = authorization.replace("Bearer ", "")
-    if token:
-        await db.user_sessions.delete_one({"session_token": token})
-    response.delete_cookie("session_token", path="/", samesite="none", secure=True)
+async def auth_logout():
+    # Stateless JWT — client just discards the token
     return {"ok": True}
 
 # ============ Catalog (public) ============
@@ -365,7 +307,9 @@ async def seed_data():
 
 @app.on_event("startup")
 async def on_startup():
+    await db.users.create_index("email", unique=True)
     await seed_data()
+    await seed_admin(db)
     try:
         init_storage()
     except Exception as e:
