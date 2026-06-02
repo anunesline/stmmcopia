@@ -12,6 +12,7 @@ import ProductDetail from './pages/ProductDetail';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import AdminLeads from './pages/AdminLeads';
 import AuthCallback from './pages/AuthCallback';
 
 function AppRouter() {
@@ -30,6 +31,7 @@ function AppRouter() {
           <Route path="/sobre" element={<About />} />
           <Route path="/contato" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/leads" element={<AdminLeads />} />
         </Routes>
       </main>
       <Footer />

@@ -152,6 +152,7 @@ export default function Admin() {
         <TabsList className="mb-6">
           <TabsTrigger value="products" data-testid="tab-products">Produtos ({products.length})</TabsTrigger>
           <TabsTrigger value="categories" data-testid="tab-categories">Categorias ({categories.length})</TabsTrigger>
+          <TabsTrigger value="leads" data-testid="tab-leads" onClick={(e) => { e.preventDefault(); window.location.href = '/admin/leads'; }}>Leads do chat →</TabsTrigger>
         </TabsList>
 
         <TabsContent value="products">

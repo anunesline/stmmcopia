@@ -280,6 +280,18 @@ async def serve_file(path: str):
         headers={"Cache-Control": "public, max-age=86400"},
     )
 
+@api_router.get("/admin/leads")
+async def list_leads(user: dict = Depends(require_admin), limit: int = 200):
+    items = await db.chat_messages.find({}, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+    return items
+
+
+@api_router.delete("/admin/leads/{message_id}")
+async def delete_lead(message_id: str, user: dict = Depends(require_admin)):
+    await db.chat_messages.delete_one({"message_id": message_id})
+    return {"ok": True}
+
+
 # ============ Settings & WhatsApp ============
 
 @api_router.get("/settings")
