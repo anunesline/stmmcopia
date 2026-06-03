@@ -4,6 +4,13 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from bson import ObjectId
 from dotenv import load_dotenv
+from passlib.context import CryptContext
+
+# Configurações de senha (necessário para o verify_password)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
 
 # Configurações
 load_dotenv()
@@ -12,7 +19,7 @@ db = client[os.environ.get('DB_NAME')]
 
 app = FastAPI()
 
-# Middleware CORS (Permitindo seu domínio)
+# Middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://www.mmdistribuidora.com.br", "https://mmdistribuidora.com.br"],
@@ -21,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Rotas diretas no app (sem router para evitar erro de prefixo)
+# --- ROTAS ---
 
 @app.get("/api/status")
 async def status():
@@ -29,7 +36,6 @@ async def status():
 
 @app.get("/api/products")
 async def get_products(featured: str = None):
-    # Alterado de "featured" para "is_featured" para coincidir com seu banco de dados
     query = {"is_featured": True} if featured == "true" else {}
     products = await db.products.find(query).to_list(length=100)
     for p in products:
@@ -58,13 +64,7 @@ async def get_settings():
         settings["_id"] = str(settings["_id"])
     return settings or {"whatsapp_number": "554134032999"}
 
-from pydantic import BaseModel
-
-# Modelo para validar os dados do login
-class LoginRequest(BaseModel):
-    username: str
-    password: str
-
+# Rota de Login Corrigida
 @app.post("/api/auth/login")
 async def login(data: dict):
     email = data.get("email")
@@ -74,18 +74,18 @@ async def login(data: dict):
     user = await db.test.find_one({"email": email})
     
     if not user:
-        return {"status": "error", "message": "Usuário não encontrado no banco"}
+        raise HTTPException(status_code=401, detail="Usuário não encontrado")
     
-    # DEBUG: Vamos ver o que está acontecendo
-    print(f"Senha recebida: {password}")
-    print(f"Hash no banco: {user.get('password_hash')}")
+    # Verifica a senha usando o hash
+    if verify_password(password, user.get("password_hash")):
+        # Retorna a estrutura esperada pelo AuthContext.js
+        return {
+            "session_token": "token-valido-123", # Em produção, gere um token real (JWT)
+            "user": {
+                "email": user.get("email"),
+                "name": user.get("name"),
+                "is_admin": user.get("is_admin")
+            }
+        }
     
-    # Teste direto: se o código chegar aqui e falhar, 
-    # é porque a função verify_password não está funcionando
-    try:
-        if verify_password(password, user.get("password_hash")):
-            return {"status": "success", "token": "token-valido-123"}
-        else:
-            return {"status": "error", "message": "Senha não confere"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    raise HTTPException(status_code=401, detail="Credenciais inválidas")
