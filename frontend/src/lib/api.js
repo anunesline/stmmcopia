@@ -1,3 +1,7 @@
+
+
+console.log("URL DO BACKEND:", process.env.REACT_APP_API_URL);
+
 import axios from 'axios';
 
 // Suporta tanto REACT_APP_BACKEND_URL (Emergent) quanto REACT_APP_API_URL (Vercel)
