@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// URL fixa, sem risco de ser undefined
-const API_URL = "https://stmm-ao45.onrender.com/api";
+// URL fixa para garantir que o erro de "undefined" suma
+const BACKEND_URL = "https://stmm-ao45.onrender.com";
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${BACKEND_URL}/api`,
   timeout: 30000,
 });
 
@@ -16,7 +16,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Apenas log de erro simplificado
 api.interceptors.response.use(
   (r) => r,
   (err) => {
@@ -24,3 +23,11 @@ api.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+// Função que o ProductDetail precisa
+export const resolveImg = (url) => {
+  if (!url) return '';
+  if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/')) return `${BACKEND_URL}${url}`;
+  return url;
+};
