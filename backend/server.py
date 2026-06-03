@@ -66,13 +66,14 @@ class LoginRequest(BaseModel):
     password: str
 
 @app.post("/api/auth/login")
-async def login(data: LoginRequest):
-    # Procure o usuário no banco (ajuste o nome da coleção se necessário, ex: 'users')
-    user = await db.users.find_one({"username": data.username})
+async def login(data: dict): # Recebe um dicionário genérico para não dar erro 422
+    print(f"Dados recebidos do login: {data}") # Isso aparecerá nos Logs do Render
     
-    # Validação simples (verifique se a senha bate com a que está no banco)
-    # Lembre-se: idealmente você deveria comparar hashes de senha
-    if user and user.get("password") == data.password:
+    # Tente encontrar o usuário (ajuste 'users' para o nome que você achar no Mongo)
+    # A maioria dos sistemas usa 'email' como identificador
+    user = await db.users.find_one({"email": data.get("email")})
+    
+    if user and user.get("password") == data.get("password"):
         return {"status": "success", "token": "fake-jwt-token"}
     
     raise HTTPException(status_code=401, detail="Credenciais inválidas")
