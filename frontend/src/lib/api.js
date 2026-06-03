@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// URL fixa para garantir que o erro de "undefined" suma
-const BACKEND_URL = "https://stmm-ao45.onrender.com";
+// URL fixa, sem risco de ser undefined
+const API_URL = "https://stmm-ao45.onrender.com/api";
 
 export const api = axios.create({
-  baseURL: `${BACKEND_URL}/api`,
+  baseURL: API_URL,
   timeout: 30000,
 });
 
@@ -16,11 +16,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Apenas para logar erros, sem afetar o fluxo
+// Apenas log de erro simplificado
 api.interceptors.response.use(
   (r) => r,
   (err) => {
-    console.error('[MM API Error]:', err.message);
+    console.error('API Error:', err.message);
     return Promise.reject(err);
   }
 );
