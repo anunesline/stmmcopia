@@ -27,8 +27,14 @@ export default function ProductDetail() {
       </Link>
 
       <div className="grid lg:grid-cols-2 gap-12">
-        <div className="bg-white border border-slate-200 rounded-xl p-8 flex items-center justify-center">
-          <img img src={resolveImg(p.image)} alt={p.name} className="max-h-[480px] object-contain" />
+        <div className="bg-white border border-slate-200 rounded-xl p-8 flex items-center justify-center min-h-[300px]">
+          {/* Imagem corrigida: resolveImg aplicado e atributo img duplicado removido */}
+          <img 
+            src={resolveImg(p.image)} 
+            alt={p.name} 
+            className="max-h-[480px] object-contain"
+            onError={(e) => { e.target.style.display = 'none'; }} 
+          />
         </div>
 
         <div className="space-y-5">
