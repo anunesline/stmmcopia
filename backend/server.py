@@ -29,9 +29,8 @@ async def status():
 
 @app.get("/api/products")
 async def get_products(featured: str = None):
-    # Se o parâmetro 'featured' for recebido como "true", filtra apenas os destaques
-    # Caso contrário, retorna todos os produtos
-    query = {"featured": True} if featured == "true" else {}
+    # Alterado de "featured" para "is_featured" para coincidir com seu banco de dados
+    query = {"is_featured": True} if featured == "true" else {}
     products = await db.products.find(query).to_list(length=100)
     for p in products:
         p["_id"] = str(p["_id"])
