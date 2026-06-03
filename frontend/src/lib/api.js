@@ -24,7 +24,7 @@ api.interceptors.response.use(
   }
 );
 
-// Função que o ProductDetail precisa
+// ESSA É A FUNÇÃO QUE O VERCEL NÃO ESTÁ ENCONTRANDO
 export const resolveImg = (url) => {
   if (!url) return '';
   if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) return url;
