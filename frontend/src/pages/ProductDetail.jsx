@@ -28,7 +28,7 @@ export default function ProductDetail() {
 
       <div className="grid lg:grid-cols-2 gap-12">
         <div className="bg-white border border-slate-200 rounded-xl p-8 flex items-center justify-center">
-          <img src={resolveImg(p.image)} alt={p.name} className="max-h-[480px] object-contain" />
+          <img img src={p.image} alt={p.name} className="max-h-[480px] object-contain" />
         </div>
 
         <div className="space-y-5">
