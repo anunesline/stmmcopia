@@ -12,8 +12,8 @@ export default function Home() {
   const [number, setNumber] = useState('554134032999');
 
   useEffect(() => {
-    api.get('/products?featured=true').then((r) => setFeatured(r.data));
-    api.get('/categories').then((r) => setCategories(r.data));
+    api.get('/products?featured=true').then((r) => setFeatured(Array.isArray(r.data) ? r.data : [])).catch(() => setFeatured([]));
+    api.get('/categories').then((r) => setCategories(Array.isArray(r.data) ? r.data : [])).catch(() => setCategories([]));
     api.get('/settings').then((r) => setNumber(r.data.whatsapp_number)).catch(() => {});
   }, []);
 
@@ -84,7 +84,7 @@ export default function Home() {
           <Link to="/produtos" className="text-sm text-[#0B2861] underline underline-offset-4 hover:text-[#0EA5E9]">Ver todos os produtos</Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5" data-testid="featured-grid">
-          {featured.map((p) => <ProductCard key={p.product_id} product={p} number={number} />)}
+          {featured?.map((p) => <ProductCard key={p.product_id} product={p} number={number} />)}
         </div>
       </section>
 

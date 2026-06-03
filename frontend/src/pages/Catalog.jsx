@@ -16,7 +16,7 @@ export default function Catalog() {
   const search = params.get('search') || '';
 
   useEffect(() => {
-    api.get('/categories').then((r) => setCategories(r.data));
+    api.get('/categories').then((r) => setCategories(Array.isArray(r.data) ? r.data : [])).catch(() => setCategories([]));
     api.get('/settings').then((r) => setNumber(r.data.whatsapp_number)).catch(() => {});
   }, []);
 
@@ -26,7 +26,10 @@ export default function Catalog() {
     if (cat) q.set('category', cat);
     if (search) q.set('search', search);
     api.get(`/products?${q.toString()}`).then((r) => {
-      setProducts(r.data);
+      setProducts(Array.isArray(r.data) ? r.data : []);
+      setLoading(false);
+    }).catch(() => {
+      setProducts([]);
       setLoading(false);
     });
   }, [cat, search]);
@@ -70,7 +73,7 @@ export default function Catalog() {
                   className={`block w-full text-left px-3 py-2 rounded-md text-sm hover:bg-slate-100 ${!cat ? 'bg-[#0B2861] text-white hover:bg-[#0B2861]' : ''}`}
                 >Todas</button>
               </li>
-              {categories.map((c) => (
+              {categories?.map((c) => (
                 <li key={c.category_id}>
                   <button
                     data-testid={`filter-${c.slug}`}
@@ -90,11 +93,11 @@ export default function Catalog() {
                 <div key={i} className="aspect-square bg-slate-100 animate-pulse rounded-lg" />
               ))}
             </div>
-          ) : products.length === 0 ? (
+          ) : !products?.length ? (
             <div className="text-center py-20 text-slate-500">Nenhum produto encontrado.</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" data-testid="catalog-grid">
-              {products.map((p) => <ProductCard key={p.product_id} product={p} number={number} />)}
+              {products?.map((p) => <ProductCard key={p.product_id} product={p} number={number} />)}
             </div>
           )}
         </div>

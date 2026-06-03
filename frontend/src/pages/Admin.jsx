@@ -30,7 +30,8 @@ export default function Admin() {
 
   const load = async () => {
     const [p, c] = await Promise.all([api.get('/products'), api.get('/categories')]);
-    setProducts(p.data); setCategories(c.data);
+    setProducts(Array.isArray(p.data) ? p.data : []);
+    setCategories(Array.isArray(c.data) ? c.data : []);
   };
 
   useEffect(() => { if (user?.is_admin) load(); }, [user]);
@@ -151,13 +152,13 @@ export default function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => (
+                {products?.map((p) => (
                   <tr key={p.product_id} className="border-b last:border-0 hover:bg-slate-50" data-testid={`product-row-${p.product_id}`}>
                     <td className="py-3 px-4">
                       <img src={resolveImg(p.image)} alt={p.name} className="w-12 h-12 object-cover rounded border border-slate-200" />
                     </td>
                     <td className="font-medium text-[#0B2861]">{p.name}</td>
-                    <td className="text-slate-600">{categories.find((c) => c.slug === p.category)?.name || p.category}</td>
+                    <td className="text-slate-600">{categories?.find((c) => c.slug === p.category)?.name || p.category}</td>
                     <td>{p.is_featured && <span className="text-xs bg-[#0EA5E9]/10 text-[#0B2861] px-2 py-0.5 rounded">Sim</span>}</td>
                     <td className="text-right pr-4">
                       <button onClick={() => openEdit(p)} className="text-[#0B2861] hover:text-[#0EA5E9] mr-3" data-testid={`edit-${p.product_id}`}><Edit2 className="w-4 h-4 inline" /></button>
@@ -165,7 +166,7 @@ export default function Admin() {
                     </td>
                   </tr>
                 ))}
-                {products.length === 0 && (
+                {!products?.length && (
                   <tr><td colSpan="5" className="py-8 text-center text-slate-400">Nenhum produto cadastrado.</td></tr>
                 )}
               </tbody>
@@ -195,7 +196,7 @@ export default function Admin() {
                 <tr><th className="py-3 px-4">Nome</th><th>Slug</th><th className="text-right pr-4">Ações</th></tr>
               </thead>
               <tbody>
-                {categories.map((c) => (
+                {categories?.map((c) => (
                   <tr key={c.category_id} className="border-b last:border-0" data-testid={`cat-row-${c.slug}`}>
                     <td className="py-3 px-4 font-medium text-[#0B2861]">{c.name}</td>
                     <td className="text-slate-600 font-mono text-xs">{c.slug}</td>
@@ -232,7 +233,7 @@ export default function Admin() {
               <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                 <SelectTrigger data-testid="form-category"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
-                  {categories.map((c) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
+                  {categories?.map((c) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>

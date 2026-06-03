@@ -17,8 +17,9 @@ export default function AdminLeads() {
     setRefreshing(true);
     try {
       const r = await api.get('/admin/leads');
-      setLeads(r.data);
+      setLeads(Array.isArray(r.data) ? r.data : []);
     } catch {
+      setLeads([]);
       toast.error('Erro ao carregar leads');
     } finally {
       setRefreshing(false);
@@ -61,7 +62,7 @@ export default function AdminLeads() {
     window.open(`https://wa.me/${target}?text=${text}`, '_blank');
   };
 
-  const filtered = leads.filter((l) => {
+  const filtered = (leads || []).filter((l) => {
     if (!search) return true;
     const s = search.toLowerCase();
     return (l.name || '').toLowerCase().includes(s)
@@ -71,9 +72,9 @@ export default function AdminLeads() {
   });
 
   const stats = {
-    total: leads.length,
-    withProduct: leads.filter((l) => l.product).length,
-    withPhone: leads.filter((l) => l.phone).length,
+    total: leads?.length || 0,
+    withProduct: (leads || []).filter((l) => l.product).length,
+    withPhone: (leads || []).filter((l) => l.phone).length,
   };
 
   return (
@@ -120,7 +121,7 @@ export default function AdminLeads() {
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {filtered.map((l) => (
+            {filtered?.map((l) => (
               <div key={l.message_id} className="p-5 hover:bg-slate-50" data-testid={`lead-${l.message_id}`}>
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex-1 min-w-0">
