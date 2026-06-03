@@ -66,14 +66,20 @@ class LoginRequest(BaseModel):
     password: str
 
 @app.post("/api/auth/login")
-async def login(data: dict): # Recebe um dicionário genérico para não dar erro 422
-    print(f"Dados recebidos do login: {data}") # Isso aparecerá nos Logs do Render
+async def login(data: dict):
+    email = data.get("email")
+    password = data.get("password")
     
-    # Tente encontrar o usuário (ajuste 'users' para o nome que você achar no Mongo)
-    # A maioria dos sistemas usa 'email' como identificador
-    user = await db.users.find_one({"email": data.get("email")})
+    # Busca na coleção 'test'
+    user = await db.test.find_one({"email": email})
     
-    if user and user.get("password") == data.get("password"):
-        return {"status": "success", "token": "fake-jwt-token"}
+    if not user:
+        raise HTTPException(status_code=401, detail="Usuário não encontrado")
     
-    raise HTTPException(status_code=401, detail="Credenciais inválidas")
+    # Usa a função importada 'verify_password' para checar a senha contra o hash
+    # O campo no seu banco se chama 'password_hash'
+    if verify_password(password, user.get("password_hash")):
+        # Login com sucesso!
+        return {"status": "success", "token": "token-valido-123"}
+    
+    raise HTTPException(status_code=401, detail="Senha incorreta")
