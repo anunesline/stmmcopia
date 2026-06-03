@@ -57,3 +57,22 @@ async def get_settings():
     if settings:
         settings["_id"] = str(settings["_id"])
     return settings or {"whatsapp_number": "554134032999"}
+
+from pydantic import BaseModel
+
+# Modelo para validar os dados do login
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/auth/login")
+async def login(data: LoginRequest):
+    # Procure o usuário no banco (ajuste o nome da coleção se necessário, ex: 'users')
+    user = await db.users.find_one({"username": data.username})
+    
+    # Validação simples (verifique se a senha bate com a que está no banco)
+    # Lembre-se: idealmente você deveria comparar hashes de senha
+    if user and user.get("password") == data.password:
+        return {"status": "success", "token": "fake-jwt-token"}
+    
+    raise HTTPException(status_code=401, detail="Credenciais inválidas")
