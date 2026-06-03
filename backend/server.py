@@ -24,18 +24,49 @@ db = client[db_name]
 app = FastAPI()
 api_router = APIRouter() # Removi o prefixo aqui para testar sem ele
 
-# 3. Middleware de CORS (Configuração mais rigorosa para o seu domínio)
+# 3. Middleware de CORS (Agressivo)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://www.mmdistribuidora.com.br", 
-        "https://mmdistribuidora.com.br",
-        "http://localhost:3000"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- ROTAS CORRIGIDAS (Agora sem o prefixo no router) ---
+@api_router.get("/api/status")
+async def status():
+    return {"status": "ok"}
+
+@api_router.get("/api/products")
+async def get_products():
+    products = await db.products.find().to_list(length=100)
+    for p in products:
+        p["_id"] = str(p["_id"])
+    return products
+
+@api_router.get("/api/products/{product_id}")
+async def get_product(product_id: str):
+    from bson import ObjectId
+    product = await db.products.find_one({"_id": ObjectId(product_id)})
+    if not product:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    product["_id"] = str(product["_id"])
+    return product
+
+@api_router.get("/api/categories")
+async def get_categories():
+    categories = await db.categories.find().to_list(length=100)
+    for c in categories:
+        c["_id"] = str(c["_id"])
+    return categories
+
+@api_router.get("/api/settings")
+async def get_settings():
+    settings = await db.settings.find_one({})
+    if settings:
+        settings["_id"] = str(settings["_id"])
+    return settings or {"whatsapp_number": "554134032999"}
 
 # 4. Inclusão do Router
 app.include_router(api_router)
