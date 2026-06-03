@@ -19,13 +19,18 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
+
     try {
+      // Chamando a função de login que está no seu AuthContext
       await login(email, password);
+      
+      // Se login() não lançar erro, redirecionamos
       const dest = location.state?.from || '/admin';
       navigate(dest);
     } catch (err) {
-      const d = err.response?.data?.detail;
-      setError(typeof d === 'string' ? d : 'Erro ao entrar');
+      // Tratamento de erro detalhado
+      console.error("Erro no login:", err);
+      setError(err.message || 'Erro ao entrar. Verifique suas credenciais.');
     } finally {
       setLoading(false);
     }
@@ -60,7 +65,6 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
                 className="pl-9 h-11"
-                autoComplete="email"
                 required
               />
             </div>
@@ -77,7 +81,6 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="pl-9 h-11"
-                autoComplete="current-password"
                 required
               />
             </div>
@@ -92,10 +95,6 @@ export default function Login() {
             {loading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
-
-        <p className="text-center text-xs text-slate-400 mt-6">
-          Acesso restrito · MM Comércio e Distribuidora
-        </p>
       </div>
     </div>
   );
