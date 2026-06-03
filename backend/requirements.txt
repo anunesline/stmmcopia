@@ -13,3 +13,5 @@ requests==2.33.1
 requests-oauthlib==2.0.0
 uvicorn==0.25.0
 gunicorn
+passlib
+bcrypt
