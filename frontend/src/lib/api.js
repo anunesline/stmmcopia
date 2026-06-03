@@ -27,7 +27,12 @@ api.interceptors.response.use(
 // ESSA FUNÇÃO É O QUE O VERCEL ESTÁ RECLAMANDO QUE NÃO EXISTE
 export const resolveImg = (url) => {
   if (!url) return '';
-  if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) return url;
+  // Se já for uma URL completa, retorna ela
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+  
+  // Se começar com /, tenta direto no backend
   if (url.startsWith('/')) return `${BACKEND_URL}${url}`;
-  return url;
+  
+  // A TENTATIVA MAIS PROVÁVEL: O backend espera /api/files/ + nome do arquivo
+  return `${BACKEND_URL}/api/files/${url}`;
 };
