@@ -74,12 +74,18 @@ async def login(data: dict):
     user = await db.test.find_one({"email": email})
     
     if not user:
-        raise HTTPException(status_code=401, detail="Usuário não encontrado")
+        return {"status": "error", "message": "Usuário não encontrado no banco"}
     
-    # Usa a função importada 'verify_password' para checar a senha contra o hash
-    # O campo no seu banco se chama 'password_hash'
-    if verify_password(password, user.get("password_hash")):
-        # Login com sucesso!
-        return {"status": "success", "token": "token-valido-123"}
+    # DEBUG: Vamos ver o que está acontecendo
+    print(f"Senha recebida: {password}")
+    print(f"Hash no banco: {user.get('password_hash')}")
     
-    raise HTTPException(status_code=401, detail="Senha incorreta")
+    # Teste direto: se o código chegar aqui e falhar, 
+    # é porque a função verify_password não está funcionando
+    try:
+        if verify_password(password, user.get("password_hash")):
+            return {"status": "success", "token": "token-valido-123"}
+        else:
+            return {"status": "error", "message": "Senha não confere"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
