@@ -24,7 +24,7 @@ api.interceptors.response.use(
   }
 );
 
-// ESSA É A FUNÇÃO QUE O VERCEL NÃO ESTÁ ENCONTRANDO
+// ESSA FUNÇÃO É O QUE O VERCEL ESTÁ RECLAMANDO QUE NÃO EXISTE
 export const resolveImg = (url) => {
   if (!url) return '';
   if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) return url;
