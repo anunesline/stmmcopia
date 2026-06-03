@@ -1,18 +1,9 @@
-
-
-console.log("URL DO BACKEND:", process.env.REACT_APP_API_URL);
-
 import axios from 'axios';
 
-// Suporta tanto REACT_APP_BACKEND_URL (Emergent) quanto REACT_APP_API_URL (Vercel)
-// Defina UMA das duas no painel de variáveis de ambiente.
-const BACKEND_URL =
-  process.env.REACT_APP_API_URL ||
-  process.env.REACT_APP_BACKEND_URL ||
-  '';
+// FORCE A URL PARA TESTAR - depois que funcionar, voltamos para o process.env
+const BACKEND_URL = "https://stmm-ao45.onrender.com";
 
-// Se a URL já termina com /api, usa direto; senão concatena /api
-export const API = BACKEND_URL.replace(/\/$/, '') + (BACKEND_URL.endsWith('/api') ? '' : '/api');
+export const API = `${BACKEND_URL}/api;
 
 if (!BACKEND_URL) {
   // eslint-disable-next-line no-console
