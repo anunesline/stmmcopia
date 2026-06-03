@@ -6,7 +6,7 @@ from bson import ObjectId
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 
-# Configurações de senha (necessário para o verify_password)
+# Configurações de senha
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verify_password(plain_password, hashed_password):
@@ -29,6 +29,10 @@ app.add_middleware(
 )
 
 # --- ROTAS ---
+
+@app.get("/")
+async def root():
+    return {"message": "API está rodando!"}
 
 @app.get("/api/status")
 async def status():
@@ -64,7 +68,6 @@ async def get_settings():
         settings["_id"] = str(settings["_id"])
     return settings or {"whatsapp_number": "554134032999"}
 
-# Rota de Login Corrigida
 @app.post("/api/auth/login")
 async def login(data: dict):
     email = data.get("email")
@@ -80,7 +83,7 @@ async def login(data: dict):
     if verify_password(password, user.get("password_hash")):
         # Retorna a estrutura esperada pelo AuthContext.js
         return {
-            "session_token": "token-valido-123", # Em produção, gere um token real (JWT)
+            "session_token": "token-valido-123",
             "user": {
                 "email": user.get("email"),
                 "name": user.get("name"),
