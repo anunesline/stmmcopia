@@ -23,6 +23,11 @@ export default function Admin() {
   const [form, setForm] = useState(EMPTY);
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
+  
+  useEffect(() => {
+  console.log("Estado do usuário:", user);
+  console.log("Loading:", loading);
+}, [user, loading]);
 
   const load = async () => {
   try {
@@ -120,7 +125,4 @@ export default function Admin() {
     </div>
   );
 }
-useEffect(() => {
-    console.log("Estado do usuário:", user);
-    console.log("Loading:", loading);
-  }, [user, loading]);
+
