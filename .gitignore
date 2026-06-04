@@ -1,11 +1,10 @@
 # Pastas e arquivos de dependências
 node_modules/
-package-lock.json
 .pnp
 .pnp.js
 
 # Build e Produção
-/build
+!/build
 dist/
 *.tsbuildinfo
 
