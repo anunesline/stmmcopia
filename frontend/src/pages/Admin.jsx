@@ -58,7 +58,7 @@ export default function Admin() {
       const fd = new FormData();
       fd.append('file', file);
       // Ajustado para o endpoint correto do seu server.py
-      const r = await api.post('/api/admin/upload', fd);
+      const r = await api.post('/admin/upload', fd);
       setForm((f) => ({ ...f, image: r.data.url }));
       toast.success('Imagem enviada');
     } catch (err) {
