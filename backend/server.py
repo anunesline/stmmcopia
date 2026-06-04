@@ -1,16 +1,16 @@
 import os
 import logging
-from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-from bson import ObjectId
 from auth import verify_password, create_token, seed_admin
 
+# Configuração de Logs
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="STMM API")
 
-# Configuração de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,57 +21,46 @@ app.add_middleware(
 
 api = APIRouter(prefix="/api")
 
-# Conexão com Banco de Dados dentro do startup
+# Conexão com Banco de Dados usando lifespan (método moderno e recomendado)
 @app.on_event("startup")
-async def startup():
-    # Pega a URL do painel do Render
+async def startup_event():
     mongo_url = os.getenv("MONGO_URL")
     if not mongo_url:
-        raise ValueError("A variável MONGO_URL não está configurada no Render!")
+        logger.error("ERRO: Variável MONGO_URL não encontrada no Render!")
+        return
 
-    app.mongodb_client = AsyncIOMotorClient(mongo_url)
-    app.db = app.mongodb_client['test']
-    
-    # Executa os seeds
-    await seed_admin(app.db)
-    await seed_initial_data(app.db)
-    logger.info("Conexão com MongoDB estabelecida e dados inicializados.")
+    try:
+        app.mongodb_client = AsyncIOMotorClient(mongo_url)
+        app.db = app.mongodb_client['test']
+        
+        # Seeders
+        await seed_admin(app.db)
+        await seed_initial_data(app.db)
+        logger.info("Conexão MongoDB estabelecida e seeds carregados.")
+    except Exception as e:
+        logger.error(f"Erro ao conectar ao MongoDB: {e}")
 
 async def seed_initial_data(db):
-    """Seed de categorias e produtos iniciais"""
     if await db.categories.count_documents({}) == 0:
         await db.categories.insert_many([
-            {"name": "Eletrônicos", "slug": "eletronicos", "description": "Produtos eletrônicos diversos"},
-            {"name": "Acessórios", "slug": "acessorios", "description": "Acessórios e complementos"},
-            {"name": "Vestuário", "slug": "vestuario", "description": "Roupas e vestuário"},
+            {"name": "Eletrônicos", "slug": "eletronicos"},
+            {"name": "Acessórios", "slug": "acessorios"},
         ])
     
     if await db.products.count_documents({}) == 0:
-        await db.products.insert_many([
-            {
-                "name": "Produto Exemplo 1",
-                "slug": "produto-exemplo-1",
-                "category": "eletronicos",
-                "price": 99.90,
-                "image": "https://via.placeholder.com/300?text=Produto+1",
-                "description": "Este é um produto de exemplo",
-            },
-        ])
+        await db.products.insert_one({
+            "name": "Produto de Teste",
+            "slug": "produto-teste",
+            "price": 10.0
+        })
 
-# Rotas
 @api.get("/products")
 async def get_products():
-    products = await app.db.products.find().to_list(length=100)
+    cursor = app.db.products.find({})
+    products = await cursor.to_list(length=100)
     for p in products:
         p["product_id"] = str(p.pop("_id"))
     return products
-
-@api.get("/categories")
-async def get_categories():
-    categories = await app.db.categories.find().to_list(length=100)
-    for c in categories:
-        c["category_id"] = str(c.pop("_id"))
-    return categories
 
 @api.post("/auth/login")
 async def login(data: dict):
@@ -83,6 +72,6 @@ async def login(data: dict):
         raise HTTPException(status_code=401, detail="Email ou senha inválidos")
     
     token = create_token(str(user["_id"]), user["email"])
-    return {"session_token": token, "user": {"email": user["email"], "name": user.get("name")}}
+    return {"session_token": token, "user": {"email": user["email"]}}
 
 app.include_router(api)
