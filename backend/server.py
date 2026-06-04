@@ -81,7 +81,6 @@ async def login(data: dict):
     
     # Verifica a senha usando o hash
     if verify_password(password, user.get("password_hash")):
-        # Retorna a estrutura esperada pelo AuthContext.js
         return {
             "session_token": "token-valido-123",
             "user": {
@@ -92,11 +91,10 @@ async def login(data: dict):
         }
     
     raise HTTPException(status_code=401, detail="Credenciais inválidas")
-    @app.get("/api/auth/me")
+
+@app.get("/api/auth/me")
 async def get_me():
-    # Isso é um endpoint de exemplo. 
-    # Em uma aplicação real, você deveria extrair o usuário do token (JWT).
-    # Por enquanto, vamos retornar um usuário fixo para o front parar de dar erro:
+    # Retorna o usuário fixo para o front validar a sessão
     return {
         "email": "financeiro@mmdistribuidora.com.br",
         "name": "MM Admin",
