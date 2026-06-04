@@ -41,3 +41,8 @@ async def login(data: dict):
 
 # Incluímos o roteador no app principal
 app.include_router(api_router)
+@api_router.get("/debug/databases")
+async def debug_db():
+    # Isso lista todos os bancos de dados no seu cluster
+    dblist = await client.list_database_names()
+    return {"bancos_encontrados": dblist}
