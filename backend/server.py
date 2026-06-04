@@ -61,3 +61,21 @@ async def upload_file(file: UploadFile = File(...)):
     return {"message": "Upload recebido"}
 
 app.include_router(api)
+
+@app.on_event("startup")
+async def startup():
+    await seed_products()
+
+async def seed_products():
+    count = await db.products.count_documents({})
+    if count == 0:
+        await db.products.insert_many([
+            {
+                "name": "Produto 1",
+                "slug": "produto-1",
+                "category": "categoria-1",
+                "price": 99.90,
+                "image": "https://example.com/image1.jpg",
+                "description": "Descrição do produto"
+            }
+        ])
