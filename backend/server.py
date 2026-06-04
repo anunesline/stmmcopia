@@ -53,3 +53,10 @@ async def get_me():
     return {"email": "admin@mm.com", "name": "Admin"}
 
 app.include_router(api_router)
+from fastapi import UploadFile, File
+
+@api_router.post("/admin/upload")
+async def upload_file(file: UploadFile = File(...)):
+    # Por enquanto, apenas confirmamos que o arquivo chegou
+    # Aqui entraria a lógica para salvar o arquivo no seu servidor ou em um storage
+    return {"filename": file.filename, "message": "Upload recebido com sucesso"}
