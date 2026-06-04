@@ -12,10 +12,10 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://www.mmdistribuidora.com.br"], # Permissão explícita para o seu domínio
+    allow_origins=["*"],  # Permite qualquer site
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"],  # Permite qualquer cabeçalho de autenticação
 )
 
 api_router = APIRouter(prefix="/api")
