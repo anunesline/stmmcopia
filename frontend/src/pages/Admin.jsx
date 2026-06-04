@@ -73,56 +73,9 @@ export default function Admin() {
     // Validação flexível: aceita a imagem que já está no form (carregada do banco ou via upload)
     if (!form.name || !form.category || !form.image) {
       toast.error('Preencha nome, foto e categoria');
-      return;
-    }
-    try {
-      if (editing) {
-        await api.put(`/api/admin/products/${editing.product_id}`, form);
-        toast.success('Produto atualizado');
-      } else {
-        await api.post('/api/admin/products', form);
-        toast.success('Produto criado');
-      }
-      setOpen(false);
-      load();
-    } catch (e) {
-      toast.error('Erro ao salvar produto');
-    }
-  };
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <div className="flex justify-between mb-8">
-        <h1 className="text-3xl font-bold text-[#0B2861]">Painel Admin</h1>
-        <Button onClick={openNew}>+ Novo Produto</Button>
-      </div>
-
-      {/* Tabela de produtos aqui... (mantive a estrutura original) */}
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{editing ? 'Editar produto' : 'Novo produto'}</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div><Label>Nome *</Label><Input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} /></div>
-            <div><Label>Categoria *</Label>
-              <Select value={form.category} onValueChange={(v) => setForm({...form, category: v})}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>{categories?.map((c) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div>
-                <Label>Foto *</Label>
-                {form.image && <img src={resolveImg(form.image)} alt="preview" className="w-20 h-20 mb-2 object-cover rounded" />}
-                <input type="file" onChange={onUpload} disabled={uploading} />
-            </div>
-            <div className="flex items-center gap-2"><Switch checked={form.is_featured} onCheckedChange={(v) => setForm({...form, is_featured: v})} /><Label>Destacar</Label></div>
-          </div>
-          <DialogFooter>
-            <Button onClick={save}>{editing ? 'Salvar alterações' : 'Criar'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
+     return (
+  <div className="p-10">
+    <h1 className="text-4xl text-black">TESTE DE CARGA</h1>
+    <p>Se você está vendo isso, o React funcionou!</p>
+  </div>
+);
