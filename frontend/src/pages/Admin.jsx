@@ -1,23 +1,7 @@
-export default function Admin() {
-  const { user, loading } = useAuth();
-  
-  // LOG DE DEBUG: Vamos ver no console se o usuário existe
-  useEffect(() => {
-    console.log("DEBUG AUTH - User:", user);
-    console.log("DEBUG AUTH - Loading:", loading);
-  }, [user, loading]);
-
-  // Se estiver carregando, mostra o loading
-  if (loading) return <div className="text-center py-20">Carregando autenticação...</div>;
-
-  // LOG DE DEBUG: Se não entrar aqui, ele está parando no "return null"
-  if (!user) {
-    return <div className="text-center py-20">Você não está logado.</div>;
-  }
-  
-  if (!user.is_admin) {
-    return <div className="text-center py-20">Acesso negado: você não é admin.</div>;
-  }
+import React, { useEffect, useState } from 'react';
+import { Plus, Trash2, Edit2, Upload, X, LogOut } from 'lucide-react';
+import { Button } from '../components/ui/button';
+...
 
   // O resto do componente (load, estados, render)...
 import React, { useEffect, useState } from 'react';
