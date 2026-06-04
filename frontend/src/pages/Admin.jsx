@@ -24,12 +24,16 @@ export default function Admin() {
   const [open, setOpen] = useState(false);
 
   const load = async () => {
-    try {
-      const [p, c] = await Promise.all([api.get('/products'), api.get('/categories')]);
-      setProducts(Array.isArray(p.data) ? p.data : []);
-      setCategories(Array.isArray(c.data) ? c.data : []);
-    } catch (e) { toast.error("Erro ao carregar dados"); }
-  };
+  try {
+    const [p, c] = await Promise.all([api.get('/products'), api.get('/categories')]);
+    console.log("Produtos recebidos:", p.data); // Verifique isso no F12 -> Console
+    setProducts(Array.isArray(p.data) ? p.data : []);
+    setCategories(Array.isArray(c.data) ? c.data : []);
+  } catch (e) {
+    console.error("Erro ao carregar:", e);
+    toast.error("Erro ao carregar produtos");
+  }
+};
 
   useEffect(() => { if (user?.is_admin) load(); }, [user]);
 
