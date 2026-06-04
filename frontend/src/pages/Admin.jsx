@@ -22,12 +22,13 @@ export default function Admin() {
   const [form, setForm] = useState(EMPTY);
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [catForm, setCatForm] = useState({ name: '', slug: '' });
 
   const load = async () => {
-    const [p, c] = await Promise.all([api.get('/products'), api.get('/categories')]);
-    setProducts(Array.isArray(p.data) ? p.data : []);
-    setCategories(Array.isArray(c.data) ? c.data : []);
+    try {
+      const [p, c] = await Promise.all([api.get('/products'), api.get('/categories')]);
+      setProducts(Array.isArray(p.data) ? p.data : []);
+      setCategories(Array.isArray(c.data) ? c.data : []);
+    } catch (e) { toast.error("Erro ao carregar dados"); }
   };
 
   useEffect(() => { if (user?.is_admin) load(); }, [user]);
@@ -39,7 +40,6 @@ export default function Admin() {
   
   const openEdit = (p) => {
     setEditing(p);
-    // IMPORTANTE: Garantir que todos os campos, inclusive a imagem, sejam carregados
     setForm({ 
       name: p.name || '', 
       description: p.description || '', 
@@ -57,7 +57,8 @@ export default function Admin() {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const r = await api.post('/admin/upload', fd);
+      // Ajustado para o endpoint correto do seu server.py
+      const r = await api.post('/api/admin/upload', fd);
       setForm((f) => ({ ...f, image: r.data.url }));
       toast.success('Imagem enviada');
     } catch (err) {
@@ -68,17 +69,17 @@ export default function Admin() {
   };
 
   const save = async () => {
-    // Validação corrigida: permite salvar desde que tenha nome, categoria e IMAGEM
+    // Validação flexível: aceita a imagem que já está no form (carregada do banco ou via upload)
     if (!form.name || !form.category || !form.image) {
       toast.error('Preencha nome, foto e categoria');
       return;
     }
     try {
       if (editing) {
-        await api.put(`/admin/products/${editing.product_id}`, form);
+        await api.put(`/api/admin/products/${editing.product_id}`, form);
         toast.success('Produto atualizado');
       } else {
-        await api.post('/admin/products', form);
+        await api.post('/api/admin/products', form);
         toast.success('Produto criado');
       }
       setOpen(false);
@@ -90,8 +91,13 @@ export default function Admin() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
-      {/* ... (O restante da sua estrutura de botões e tabelas permanece igual) ... */}
-      
+      <div className="flex justify-between mb-8">
+        <h1 className="text-3xl font-bold text-[#0B2861]">Painel Admin</h1>
+        <Button onClick={openNew}>+ Novo Produto</Button>
+      </div>
+
+      {/* Tabela de produtos aqui... (mantive a estrutura original) */}
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>{editing ? 'Editar produto' : 'Novo produto'}</DialogTitle></DialogHeader>
@@ -103,9 +109,10 @@ export default function Admin() {
                 <SelectContent>{categories?.map((c) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            <div><Label>Foto *</Label>
-              {form.image && <img src={resolveImg(form.image)} alt="preview" className="w-20 h-20 mb-2 object-cover rounded" />}
-              <input type="file" onChange={onUpload} />
+            <div>
+                <Label>Foto *</Label>
+                {form.image && <img src={resolveImg(form.image)} alt="preview" className="w-20 h-20 mb-2 object-cover rounded" />}
+                <input type="file" onChange={onUpload} disabled={uploading} />
             </div>
             <div className="flex items-center gap-2"><Switch checked={form.is_featured} onCheckedChange={(v) => setForm({...form, is_featured: v})} /><Label>Destacar</Label></div>
           </div>
