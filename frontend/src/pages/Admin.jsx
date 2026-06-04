@@ -131,3 +131,7 @@ export default function Admin() {
     </div>
   );
 }
+useEffect(() => {
+    console.log("Estado do usuário:", user);
+    console.log("Loading:", loading);
+  }, [user, loading]);
