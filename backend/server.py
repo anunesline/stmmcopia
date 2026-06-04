@@ -1,28 +1,20 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from bson import ObjectId
 from dotenv import load_dotenv
 from passlib.context import CryptContext
+import shutil
 
-# Configuração de senha
+# Configurações iniciais
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-def verify_password(plain_password, hashed_password):
-    try:
-        return pwd_context.verify(plain_password, hashed_password)
-    except:
-        return False
-
-# Configurações
 load_dotenv()
 client = AsyncIOMotorClient(os.environ.get('MONGO_URL'))
 db = client[os.environ.get('DB_NAME')]
 
 app = FastAPI()
 
-# Middleware CORS - Permitindo tudo para evitar bloqueios
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,47 +23,57 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- ROTAS GERAIS ---
-
+# --- ROTAS PÚBLICAS ---
 @app.get("/")
-async def root():
-    return {"message": "API está rodando!"}
-
-@app.get("/api/status")
-async def status():
-    return {"status": "ok"}
-
-# --- ROTAS DE PRODUTOS E CATEGORIAS ---
+async def root(): return {"message": "API OK"}
 
 @app.get("/api/products")
 async def get_products(featured: str = None):
     query = {"is_featured": True} if featured == "true" else {}
     products = await db.products.find(query).to_list(length=100)
-    for p in products:
-        p["_id"] = str(p["_id"])
+    for p in products: p["product_id"] = str(p.pop("_id"))
     return products
-
-@app.get("/api/products/{product_id}")
-async def get_product(product_id: str):
-    product = await db.products.find_one({"_id": ObjectId(product_id)})
-    if not product:
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-    product["_id"] = str(product["_id"])
-    return product
 
 @app.get("/api/categories")
 async def get_categories():
     categories = await db.categories.find().to_list(length=100)
-    for c in categories:
-        c["_id"] = str(c["_id"])
+    for c in categories: c["category_id"] = str(c.pop("_id"))
     return categories
 
-@app.get("/api/settings")
-async def get_settings():
-    settings = await db.settings.find_one({})
-    if settings:
-        settings["_id"] = str(settings["_id"])
-    return settings or {"whatsapp_number": "554134032999"}
+# --- ROTAS DE ADMIN (CRUD) ---
+
+@app.post("/api/admin/upload")
+async def upload(file: UploadFile = File(...)):
+    # Nota: Em servidores como Render, arquivos locais são temporários. 
+    # Use um serviço como Cloudinary ou S3 em produção real.
+    filename = f"{ObjectId()}_{file.filename}"
+    return {"url": f"/uploads/{filename}"}
+
+@app.post("/api/admin/products")
+async def create_product(data: dict):
+    result = await db.products.insert_one(data)
+    return {"id": str(result.inserted_id)}
+
+@app.put("/api/admin/products/{id}")
+async def update_product(id: str, data: dict):
+    data.pop("product_id", None) # Remove campo extra se existir
+    await db.products.update_one({"_id": ObjectId(id)}, {"$set": data})
+    return {"status": "ok"}
+
+@app.delete("/api/admin/products/{id}")
+async def delete_product(id: str):
+    await db.products.delete_one({"_id": ObjectId(id)})
+    return {"status": "ok"}
+
+@app.post("/api/admin/categories")
+async def create_category(data: dict):
+    await db.categories.insert_one(data)
+    return {"status": "ok"}
+
+@app.delete("/api/admin/categories/{id}")
+async def delete_category(id: str):
+    await db.categories.delete_one({"_id": ObjectId(id)})
+    return {"status": "ok"}
 
 # --- ROTAS DE AUTENTICAÇÃO ---
 
@@ -79,8 +81,6 @@ async def get_settings():
 async def login(data: dict):
     email = data.get("email")
     password = data.get("password")
-    
-    # Busca na coleção 'users' (confirme se o nome é este no seu Atlas)
     user = await db.users.find_one({"email": email})
     
     if not user:
@@ -95,13 +95,8 @@ async def login(data: dict):
                 "is_admin": True
             }
         }
-    
     raise HTTPException(status_code=401, detail="Senha incorreta")
 
 @app.get("/api/auth/me")
 async def get_me():
-    return {
-        "email": "financeiro@mmdistribuidora.com.br",
-        "name": "MM Admin",
-        "is_admin": True
-    }
+    return {"email": "admin@mm.com", "name": "MM Admin", "is_admin": True}
