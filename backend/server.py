@@ -9,6 +9,12 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client['saturnlabs']
 
 app = FastAPI()
+# Mantenha o seu client como está, mas adicione isto logo abaixo:
+@api_router.get("/debug/all-dbs")
+async def debug_all_dbs():
+    # Isso lista todos os bancos do seu cluster
+    dbs = await client.list_database_names()
+    return {"bancos_encontrados": dbs}
 
 app.add_middleware(
     CORSMiddleware,
