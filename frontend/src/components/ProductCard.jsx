@@ -1,20 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { buildWhatsAppUrl } from './WhatsAppWidget';
 import { resolveImg } from '../lib/api';
 
 export default function ProductCard({ product, number = '554134032999' }) {
-  console.log("Renderizando produto:", product); // <--- ADICIONE ISSO
-  return (
-    <div className="border p-4">
-       <h3>{product.name}</h3>
-       {/* ... resto do código */}
-    </div>
-  );
-}
+  // Verificação básica para evitar erro caso o produto venha vazio
+  if (!product) return null;
+
   const wppUrl = buildWhatsAppUrl({ number, product: product.name });
+
   return (
     <div
       data-testid={`product-card-${product.product_id}`}
@@ -23,13 +18,17 @@ export default function ProductCard({ product, number = '554134032999' }) {
       <div className="relative bg-slate-50 aspect-square overflow-hidden">
         <img
           src={resolveImg(product.image)}
-          alt={product.name}
+          alt={product.name || 'Produto'}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-display text-lg text-[#0B2861] leading-tight">{product.name}</h3>
-        <p className="text-xs text-slate-500 mt-2 leading-relaxed line-clamp-3 flex-1">{product.description}</p>
+        <h3 className="font-display text-lg text-[#0B2861] leading-tight">
+          {product.name}
+        </h3>
+        <p className="text-xs text-slate-500 mt-2 leading-relaxed line-clamp-3 flex-1">
+          {product.description}
+        </p>
         <a
           href={wppUrl}
           target="_blank"
