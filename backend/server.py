@@ -4,7 +4,7 @@ from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
-from .auth import verify_password, create_token, seed_admin
+from auth import verify_password, create_token, seed_admin
 
 logger = logging.getLogger(__name__)
 
