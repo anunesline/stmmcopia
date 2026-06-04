@@ -26,7 +26,10 @@ async def get_settings():
 
 @api_router.get("/products")
 async def get_products():
-    # Vamos ver o que tem no banco
+    # LISTAR TODAS AS COLEÇÕES DO BANCO
+    colecoes = await db.list_collection_names()
+    print(f"DEBUG: Coleções existentes no banco 'saturnlabs': {colecoes}")
+    
     products = await db.products.find().to_list(length=100)
     print(f"DEBUG: Encontrei {len(products)} produtos na coleção 'products'")
     
