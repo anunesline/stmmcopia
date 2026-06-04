@@ -9,7 +9,7 @@ from .auth import verify_password, create_token, seed_admin
 logger = logging.getLogger(__name__)
 
 # Configuração de Banco
-MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://saturnlabs_db_user:saturn123@cluster0.mugiyqh.mongodb.net/?retryWrites=true&w=majority")
+MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://saturnlabs_db_user:suser123@cluster0.mugiyqh.mongodb.net/?retryWrites=true&w=majority")
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['test']
 
