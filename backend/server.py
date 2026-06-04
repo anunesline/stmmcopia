@@ -35,7 +35,22 @@ async def get_categories():
 
 @api.post("/auth/login")
 async def login(data: dict):
-    return {"session_token": "token-123", "user": {"email": data.get("email"), "name": "Admin", "is_admin": True}}
+    email = data.get("email", "").lower().strip()
+    password = data.get("password", "")
+    
+    user = await db.users.find_one({"email": email})
+    if not user or not verify_password(password, user.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="Email ou senha inválidos")
+    
+    token = create_token(user["user_id"], user["email"])
+    return {
+        "session_token": token,
+        "user": {
+            "email": user["email"],
+            "name": user["name"],
+            "is_admin": user["is_admin"]
+        }
+    }
 
 @api.get("/auth/me")
 async def get_me():
