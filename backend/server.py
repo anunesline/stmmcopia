@@ -1,14 +1,16 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import APIRouter
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+# Conecte-se usando a URL do ambiente
+client = AsyncIOMotorClient(os.environ.get('MONGO_URL'))
+db = client.get_database() # Pega o banco definido na connection string
+
 app = FastAPI()
 
-# Middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,33 +18,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Criamos um roteador com prefixo /api
-api_router = APIRouter(prefix="/api")
+@app.get("/api/test")
+async def test():
+    return {"status": "A API ESTÁ FUNCIONANDO"}
 
-@api_router.get("/settings")
-async def get_settings():
-    return {"whatsapp_number": "554134032999"}
-
-@api_router.get("/auth/me")
-async def get_me():
-    return {"email": "financeiro@mmdistribuidora.com.br", "name": "Admin", "is_admin": True}
-
-@api_router.get("/categories")
-async def get_categories():
-    return [] # Retornando vazio para testar se o erro 404 some
-
-@api_router.get("/products")
+@app.get("/api/products")
 async def get_products():
-    return []
-
-@api_router.post("/auth/login")
-async def login(data: dict):
-    return {"session_token": "token-123", "user": {"email": "admin@mm.com", "name": "Admin", "is_admin": True}}
-
-# Incluímos o roteador no app principal
-app.include_router(api_router)
-@api_router.get("/debug/databases")
-async def debug_db():
-    # Isso lista todos os bancos de dados no seu cluster
-    dblist = await client.list_database_names()
-    return {"bancos_encontrados": dblist}
+    # Tenta listar coleções para verificar conexão
+    try:
+        collections = await db.list_collection_names()
+        products = await db.products.find().to_list(length=100)
+        return {"collections": collections, "products": products}
+    except Exception as e:
+        return {"error": str(e)}
