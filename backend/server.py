@@ -60,3 +60,23 @@ async def upload_file(file: UploadFile = File(...)):
     # Por enquanto, apenas confirmamos que o arquivo chegou
     # Aqui entraria a lógica para salvar o arquivo no seu servidor ou em um storage
     return {"filename": file.filename, "message": "Upload recebido com sucesso"}
+    from bson import ObjectId
+
+# Rota para salvar/editar um produto (PUT)
+@api_router.put("/products/{product_id}")
+async def update_product(product_id: str, data: dict):
+    # Removemos o campo id para não tentar gravar no lugar do _id do MongoDB
+    data.pop("product_id", None)
+    await db.products.update_one({"_id": ObjectId(product_id)}, {"$set": data})
+    return {"message": "Produto atualizado com sucesso"}
+
+# Rota para deletar um produto (DELETE)
+@api_router.delete("/products/{product_id}")
+async def delete_product(product_id: str):
+    await db.products.delete_one({"_id": ObjectId(product_id)})
+    return {"message": "Produto removido"}
+
+# Rota de upload que faltava
+@api_router.post("/admin/upload")
+async def upload_file(file: UploadFile = File(...)):
+    return {"filename": file.filename, "message": "Upload recebido"}
