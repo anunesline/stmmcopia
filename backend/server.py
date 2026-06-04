@@ -6,11 +6,15 @@ from bson import ObjectId
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 
-# Configurações de senha
+# Configuração robusta para o BCrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception as e:
+        print(f"Erro na verificação de senha: {e}")
+        return False
 
 # Configurações
 load_dotenv()
@@ -73,14 +77,18 @@ async def login(data: dict):
     email = data.get("email")
     password = data.get("password")
     
-    # Busca na coleção 'test'
     user = await db.test.find_one({"email": email})
     
     if not user:
         raise HTTPException(status_code=401, detail="Usuário não encontrado")
     
-    # Verifica a senha usando o hash
-    if verify_password(password, user.get("password_hash")):
+    stored_hash = user.get("password_hash")
+    
+    # DEBUG: IMPRIME NO LOG DO RENDER
+    is_valid = verify_password(password, stored_hash)
+    print(f"DEBUG LOGIN: Email={email} | Resultado da validação={is_valid} | Hash banco={stored_hash}")
+    
+    if is_valid:
         return {
             "session_token": "token-valido-123",
             "user": {
@@ -94,7 +102,6 @@ async def login(data: dict):
 
 @app.get("/api/auth/me")
 async def get_me():
-    # Retorna o usuário fixo para o front validar a sessão
     return {
         "email": "financeiro@mmdistribuidora.com.br",
         "name": "MM Admin",
