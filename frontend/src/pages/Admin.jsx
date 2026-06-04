@@ -38,6 +38,7 @@ export default function Admin() {
   useEffect(() => { if (user?.is_admin) load(); }, [user]);
 
   if (loading) return <div className="text-center py-20">Carregando...</div>;
+  console.log("Usuário logado:", user);
   if (!user || !user.is_admin) return null;
 
   const openNew = () => { setEditing(null); setForm(EMPTY); setOpen(true); };
