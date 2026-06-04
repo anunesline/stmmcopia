@@ -4,7 +4,6 @@ from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
-# Importação corrigida (sem o ponto)
 from auth import verify_password, create_token, seed_admin
 
 logger = logging.getLogger(__name__)
@@ -25,10 +24,10 @@ api = APIRouter(prefix="/api")
 # Conexão com Banco de Dados dentro do startup
 @app.on_event("startup")
 async def startup():
-    # Pega a URL do painel do Render ou usa a padrão como fallback
-mongo_url = os.getenv("MONGO_URL")
-if not mongo_url:
-    raise ValueError("A variável MONGO_URL não está configurada no Render!")
+    # Pega a URL do painel do Render
+    mongo_url = os.getenv("MONGO_URL")
+    if not mongo_url:
+        raise ValueError("A variável MONGO_URL não está configurada no Render!")
 
     app.mongodb_client = AsyncIOMotorClient(mongo_url)
     app.db = app.mongodb_client['test']
