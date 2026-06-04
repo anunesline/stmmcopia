@@ -6,6 +6,14 @@ import { buildWhatsAppUrl } from './WhatsAppWidget';
 import { resolveImg } from '../lib/api';
 
 export default function ProductCard({ product, number = '554134032999' }) {
+  console.log("Renderizando produto:", product); // <--- ADICIONE ISSO
+  return (
+    <div className="border p-4">
+       <h3>{product.name}</h3>
+       {/* ... resto do código */}
+    </div>
+  );
+}
   const wppUrl = buildWhatsAppUrl({ number, product: product.name });
   return (
     <div
