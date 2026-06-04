@@ -4,7 +4,7 @@ services:
     runtime: python
     pythonVersion: 3.11
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && uvicorn server:app --host 0.0.0.0 --port 10000
+    startCommand: uvicorn wsgi:app --host 0.0.0.0 --port 10000
     envVars:
       - key: JWT_SECRET
         value: secreto-123-change-me
