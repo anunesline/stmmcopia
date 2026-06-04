@@ -56,20 +56,22 @@ export default function Admin() {
   };
 
   const onUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const fd = new FormData();
-      fd.append('file', file);
-      // Ajustado para o endpoint correto do seu server.py
-      const r = await api.post('/admin/upload', fd);
-      setForm((f) => ({ ...f, image: r.data.url }));
-      toast.success('Imagem enviada');
-    } catch (err) {
-      toast.error('Erro no upload');
-    } finally {
-      setUploading(false);
+    // ...
+    // CORREÇÃO: Remova o "/api/" do início do caminho
+    const r = await api.post('/admin/upload', fd); 
+    // ...
+  };
+
+  const save = async () => {
+    // ...
+    if (editing) {
+      // CORREÇÃO: Remova o "/api/" do início do caminho
+      await api.put(`/admin/products/${editing.product_id}`, form);
+      // ...
+    } else {
+      // CORREÇÃO: Remova o "/api/" do início do caminho
+      await api.post('/admin/products', form);
+      // ...
     }
   };
 
