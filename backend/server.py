@@ -67,3 +67,13 @@ async def login(data: dict):
     user = await db.users.find_one({"email": email})
     if not user: raise HTTPException(status_code=401, detail="Usuário não encontrado")
     return {"session_token": "token-123", "user": {"email": user.get("email"), "name": "Admin", "is_admin": True}}
+@app.get("/api/auth/me")
+async def get_me():
+    # Esta rota deve retornar os dados do usuário autenticado.
+    # Se você ainda não tem um sistema de tokens completo, 
+    # este retorno "chumbado" serve para o painel admin carregar.
+    return {
+        "email": "admin@mm.com", 
+        "name": "MM Admin", 
+        "is_admin": True
+    }
