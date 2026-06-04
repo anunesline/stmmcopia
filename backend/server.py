@@ -38,7 +38,15 @@ async def get_categories():
 # Rotas de Login e Autenticação
 @api_router.post("/auth/login")
 async def login(data: dict):
-    return {"session_token": "token-123", "user": {"email": data.get("email"), "name": "Admin"}}
+    # O frontend espera 'session_token' e um objeto 'user' com 'is_admin'
+    return {
+        "session_token": "token-123", 
+        "user": {
+            "email": data.get("email"), 
+            "name": "Admin", 
+            "is_admin": True  # Isso força a liberação do acesso
+        }
+    }
 
 @api_router.get("/auth/me")
 async def get_me():
