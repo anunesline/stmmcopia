@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 # Configuração de Banco
 MONGO_URL = "mongodb+srv://saturnlabs_db_user:t7UmdDNnJBA0UdR0@cluster0.mugiyqh.mongodb.net/?retryWrites=true&w=majority"
 client = AsyncIOMotorClient(MONGO_URL)
-db = client['saturnlabs']
+db = client['test']
 
 app = FastAPI()
 
