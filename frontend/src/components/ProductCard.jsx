@@ -5,7 +5,6 @@ import { buildWhatsAppUrl } from './WhatsAppWidget';
 import { resolveImg } from '../lib/api';
 
 export default function ProductCard({ product, number = '554134032999' }) {
-  // Verificação básica para evitar erro caso o produto venha vazio
   if (!product) return null;
 
   const wppUrl = buildWhatsAppUrl({ number, product: product.name });
