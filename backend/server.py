@@ -100,3 +100,17 @@ async def login(data: dict):
 @app.get("/api/auth/me")
 async def get_me():
     return {"email": "admin@mm.com", "name": "MM Admin", "is_admin": True}
+# Rota de Configurações (que está dando 404)
+@app.get("/api/settings")
+async def get_settings():
+    settings = await db.settings.find_one({})
+    if settings:
+        settings["_id"] = str(settings["_id"])
+    return settings or {"whatsapp_number": "554134032999"}
+
+# Rota de Upload de Imagem
+@app.post("/api/admin/upload")
+async def upload(file: UploadFile = File(...)):
+    # Em produção (Render), não guarde arquivos localmente.
+    # Esta rota apenas simula o retorno de um link para o React parar de dar erro.
+    return {"url": f"https://via.placeholder.com/150"}
