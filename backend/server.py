@@ -92,3 +92,13 @@ async def login(data: dict):
         }
     
     raise HTTPException(status_code=401, detail="Credenciais inválidas")
+    @app.get("/api/auth/me")
+async def get_me():
+    # Isso é um endpoint de exemplo. 
+    # Em uma aplicação real, você deveria extrair o usuário do token (JWT).
+    # Por enquanto, vamos retornar um usuário fixo para o front parar de dar erro:
+    return {
+        "email": "financeiro@mmdistribuidora.com.br",
+        "name": "MM Admin",
+        "is_admin": True
+    }
