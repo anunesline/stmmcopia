@@ -26,8 +26,12 @@ async def get_settings():
 
 @api_router.get("/products")
 async def get_products():
+    # Vamos ver o que tem no banco
     products = await db.products.find().to_list(length=100)
-    for p in products: p["product_id"] = str(p.pop("_id"))
+    print(f"DEBUG: Encontrei {len(products)} produtos na coleção 'products'")
+    
+    for p in products: 
+        p["product_id"] = str(p.pop("_id"))
     return products
 
 @api_router.get("/categories")
