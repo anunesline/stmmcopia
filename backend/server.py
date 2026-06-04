@@ -1,50 +1,43 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
-from bson import ObjectId
 
-# 1. Configurações iniciais
 load_dotenv()
-client = AsyncIOMotorClient(os.environ.get('MONGO_URL'))
-db = client[os.environ.get('DB_NAME')]
-
 app = FastAPI()
 
-# 2. Configuração de segurança
+# Middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 3. ROTAS (Onde a mágica acontece)
+# Criamos um roteador com prefixo /api
+api_router = APIRouter(prefix="/api")
 
-@app.post("/api/auth/login")
-async def login(data: dict):
-    return {
-        "session_token": "token-valido-123",
-        "user": {"email": data.get("email"), "name": "Admin", "is_admin": True}
-    }
+@api_router.get("/settings")
+async def get_settings():
+    return {"whatsapp_number": "554134032999"}
 
-@app.get("/api/auth/me")
+@api_router.get("/auth/me")
 async def get_me():
-    return {"email": "admin@mm.com", "name": "MM Admin", "is_admin": True}
+    return {"email": "financeiro@mmdistribuidora.com.br", "name": "Admin", "is_admin": True}
 
-@app.get("/api/products")
+@api_router.get("/categories")
+async def get_categories():
+    return [] # Retornando vazio para testar se o erro 404 some
+
+@api_router.get("/products")
 async def get_products():
-    products = await db.products.find().to_list(length=100)
-    for p in products: p["product_id"] = str(p.pop("_id"))
-    return products
+    return []
 
-@app.post("/api/admin/upload")
-async def upload(file: UploadFile = File(...)):
-    return {"url": "https://via.placeholder.com/150"}
+@api_router.post("/auth/login")
+async def login(data: dict):
+    return {"session_token": "token-123", "user": {"email": "admin@mm.com", "name": "Admin", "is_admin": True}}
 
-@app.post("/api/admin/products")
-async def create_product(data: dict):
-    result = await db.products.insert_one(data)
-    return {"id": str(result.inserted_id)}
+# Incluímos o roteador no app principal
+app.include_router(api_router)
