@@ -26,8 +26,8 @@ api = APIRouter(prefix="/api")
 @app.on_event("startup")
 async def startup():
     # Pega a URL do painel do Render ou usa a padrão como fallback
-    mongo_url = os.getenv("MONGO_URL", "mongodb+srv://seu_usuario:sua_senha@cluster0.mugiyqh.mongodb.net/?retryWrites=true&w=majority")
-    
+mongo_url = os.getenv("MONGO_URL") # Apenas isso, sem a string padrão
+
     app.mongodb_client = AsyncIOMotorClient(mongo_url)
     app.db = app.mongodb_client['test']
     
