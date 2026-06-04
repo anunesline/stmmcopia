@@ -96,4 +96,24 @@ export default function Admin() {
         <DialogContent>
           <DialogHeader><DialogTitle>{editing ? 'Editar produto' : 'Novo produto'}</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div><Label>Nome *</
+            <div><Label>Nome *</Label><Input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} /></div>
+            <div><Label>Categoria *</Label>
+              <Select value={form.category} onValueChange={(v) => setForm({...form, category: v})}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>{categories?.map((c) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div><Label>Foto *</Label>
+              {form.image && <img src={resolveImg(form.image)} alt="preview" className="w-20 h-20 mb-2 object-cover rounded" />}
+              <input type="file" onChange={onUpload} />
+            </div>
+            <div className="flex items-center gap-2"><Switch checked={form.is_featured} onCheckedChange={(v) => setForm({...form, is_featured: v})} /><Label>Destacar</Label></div>
+          </div>
+          <DialogFooter>
+            <Button onClick={save}>{editing ? 'Salvar alterações' : 'Criar'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
