@@ -1,25 +1,68 @@
 import os
 import logging
+import jwt
+import bcrypt
+from datetime import datetime, timezone, timedelta
 from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-from bson import ObjectId
-
-# Import auth functions from backend
-import sys
-from pathlib import Path
-backend_dir = Path(__file__).parent / "backend"
-sys.path.insert(0, str(backend_dir))
-
-from auth import verify_password, create_token, seed_admin
 
 logger = logging.getLogger(__name__)
+JWT_ALGORITHM = "HS256"
+JWT_TTL_DAYS = 7
 
-# Configuração de Banco
+# ==================== AUTH FUNCTIONS ====================
+def _secret():
+    return os.environ.get("JWT_SECRET", "secreto-123-change-me")
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+def verify_password(plain: str, hashed: str) -> bool:
+    try:
+        return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    except Exception:
+        return False
+
+def create_token(user_id: str, email: str) -> str:
+    payload = {
+        "sub": user_id,
+        "email": email,
+        "exp": datetime.now(timezone.utc) + timedelta(days=JWT_TTL_DAYS),
+        "iat": datetime.now(timezone.utc),
+    }
+    return jwt.encode(payload, _secret(), algorithm=JWT_ALGORITHM)
+
+async def seed_admin(db):
+    email = os.environ.get("ADMIN_EMAIL", "").lower().strip()
+    password = os.environ.get("ADMIN_PASSWORD", "")
+    if not email or not password:
+        logger.warning("ADMIN_EMAIL/ADMIN_PASSWORD not set; skipping seed")
+        return
+    existing = await db.users.find_one({"email": email})
+    if existing is None:
+        await db.users.insert_one({
+            "user_id": "user_admin_001",
+            "email": email,
+            "name": "MM Admin",
+            "password_hash": hash_password(password),
+            "is_admin": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        logger.info(f"Admin seeded: {email}")
+    elif not verify_password(password, existing.get("password_hash", "")):
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {"password_hash": hash_password(password), "is_admin": True}},
+        )
+        logger.info(f"Admin password updated: {email}")
+
+# ==================== DATABASE ====================
 MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://saturnlabs_db_user:t7UmdDNnJBA0UdR0@cluster0.mugiyqh.mongodb.net/?retryWrites=true&w=majority")
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['test']
 
+# ==================== FASTAPI APP ====================
 app = FastAPI(title="STMM API")
 
 app.add_middleware(
@@ -32,7 +75,7 @@ app.add_middleware(
 
 api = APIRouter(prefix="/api")
 
-# Startup event - seed admin e dados iniciais
+# ==================== STARTUP ====================
 @app.on_event("startup")
 async def startup():
     await seed_admin(db)
@@ -73,7 +116,7 @@ async def seed_initial_data():
         ])
         logger.info("Produtos criados com sucesso")
 
-# Rotas - Todas unificadas
+# ==================== ROUTES ====================
 @api.get("/products")
 async def get_products():
     products = await db.products.find().to_list(length=100)
@@ -129,7 +172,6 @@ async def login(data: dict):
 @api.get("/auth/me")
 async def get_me(token: str = None):
     """Retorna dados do usuário autenticado (placeholder)"""
-    # Em produção, você deveria validar o token aqui
     return {
         "email": "admin@mm.com",
         "name": "Admin",
@@ -139,7 +181,6 @@ async def get_me(token: str = None):
 @api.post("/admin/upload")
 async def upload_file(file: UploadFile = File(...)):
     """Endpoint para upload de arquivos"""
-    # Em produção, você deveria salvar em S3 ou similar
     return {
         "message": "Upload recebido",
         "filename": file.filename,
