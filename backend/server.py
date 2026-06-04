@@ -62,6 +62,20 @@ async def get_products():
         p["product_id"] = str(p.pop("_id"))
     return products
 
+@api.get("/categories")
+async def get_categories():
+    cursor = app.db.categories.find({})
+    categories = await cursor.to_list(length=100)
+    for c in categories:
+        c["category_id"] = str(c.pop("_id"))
+    return categories
+
+@api.get("/settings")
+async def get_settings():
+    # Se você ainda não tem uma coleção de configurações, 
+    # retorne apenas um JSON vazio ou inicial
+    return {"site_name": "STMM", "status": "online"}
+
 @api.post("/auth/login")
 async def login(data: dict):
     email = data.get("email", "").lower().strip()
