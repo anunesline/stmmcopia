@@ -1,10 +1,12 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from bson import ObjectId
 
+# Configuração de Banco
 MONGO_URL = "mongodb+srv://saturnlabs_db_user:t7UmdDNnJBA0UdR0@cluster0.mugiyqh.mongodb.net/?retryWrites=true&w=majority"
 client = AsyncIOMotorClient(MONGO_URL)
-db = client['test'] # O banco que confirmamos que tem dados
+db = client['test']
 
 app = FastAPI()
 
@@ -17,17 +19,28 @@ app.add_middleware(
 
 api_router = APIRouter(prefix="/api")
 
-# Rota que o painel usa para configurações gerais
+# Rotas de Configuração e Info
 @api_router.get("/settings")
 async def get_settings():
-    return {"whatsapp_number": "554134032999"} # Exemplo
+    return {"whatsapp_number": "554134032999"}
 
-# Rotas de Produtos e Categorias
+# Rotas de Produtos (Listar, Editar, Deletar)
 @api_router.get("/products")
 async def get_products():
     products = await db.products.find().to_list(length=100)
     for p in products: p["product_id"] = str(p.pop("_id"))
     return products
+
+@api_router.put("/products/{product_id}")
+async def update_product(product_id: str, data: dict):
+    data.pop("product_id", None)
+    await db.products.update_one({"_id": ObjectId(product_id)}, {"$set": data})
+    return {"message": "Produto atualizado com sucesso"}
+
+@api_router.delete("/products/{product_id}")
+async def delete_product(product_id: str):
+    await db.products.delete_one({"_id": ObjectId(product_id)})
+    return {"message": "Produto removido"}
 
 @api_router.get("/categories")
 async def get_categories():
@@ -35,48 +48,21 @@ async def get_categories():
     for c in categories: c["category_id"] = str(c.pop("_id"))
     return categories
 
-# Rotas de Login e Autenticação
+# Autenticação
 @api_router.post("/auth/login")
 async def login(data: dict):
-    # O frontend espera 'session_token' e um objeto 'user' com 'is_admin'
     return {
         "session_token": "token-123", 
-        "user": {
-            "email": data.get("email"), 
-            "name": "Admin", 
-            "is_admin": True  # Isso força a liberação do acesso
-        }
+        "user": {"email": data.get("email"), "name": "Admin", "is_admin": True}
     }
 
 @api_router.get("/auth/me")
 async def get_me():
-    return {"email": "admin@mm.com", "name": "Admin"}
+    return {"email": "admin@mm.com", "name": "Admin", "is_admin": True}
+
+# Upload
+@api_router.post("/admin/upload")
+async def upload_file(file: UploadFile = File(...)):
+    return {"filename": file.filename, "message": "Upload recebido com sucesso"}
 
 app.include_router(api_router)
-from fastapi import UploadFile, File
-
-@api_router.post("/admin/upload")
-async def upload_file(file: UploadFile = File(...)):
-    # Por enquanto, apenas confirmamos que o arquivo chegou
-    # Aqui entraria a lógica para salvar o arquivo no seu servidor ou em um storage
-    return {"filename": file.filename, "message": "Upload recebido com sucesso"}
-    from bson import ObjectId
-
-# Rota para salvar/editar um produto (PUT)
-@api_router.put("/products/{product_id}")
-async def update_product(product_id: str, data: dict):
-    # Removemos o campo id para não tentar gravar no lugar do _id do MongoDB
-    data.pop("product_id", None)
-    await db.products.update_one({"_id": ObjectId(product_id)}, {"$set": data})
-    return {"message": "Produto atualizado com sucesso"}
-
-# Rota para deletar um produto (DELETE)
-@api_router.delete("/products/{product_id}")
-async def delete_product(product_id: str):
-    await db.products.delete_one({"_id": ObjectId(product_id)})
-    return {"message": "Produto removido"}
-
-# Rota de upload que faltava
-@api_router.post("/admin/upload")
-async def upload_file(file: UploadFile = File(...)):
-    return {"filename": file.filename, "message": "Upload recebido"}
