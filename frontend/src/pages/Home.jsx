@@ -58,7 +58,7 @@ export default function Home() {
       {/* DESTAQUES */}
       <section className="max-w-7xl mx-auto px-4 lg:px-8 py-20">
         <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
-          <h2 className="font-display text-3xl lg:text-5xl text-[#0B2861]">Produtos Selecionados</h2>
+          <h2 className="font-display text-3xl lg:text-5xl text-[#0B2861]">Destaques</h2>
           <Link to="/produtos" className="text-sm text-[#0B2861] underline hover:text-[#0EA5E9]">Ver todos os produtos</Link>
         </div>
         
