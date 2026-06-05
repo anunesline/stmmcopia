@@ -59,7 +59,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false CI=false react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false CI=false react-scripts build && echo 'build concluído' > build/timestamp.txt",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
