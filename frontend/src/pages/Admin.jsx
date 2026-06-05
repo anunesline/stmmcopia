@@ -6,17 +6,14 @@ import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
+const EMPTY = { name: '', description: '', price: '' };
+
 export default function Admin() {
   const { user, loading, logout } = useAuth();
   const [products, setProducts] = useState([]);
   const [editing, setEditing] = useState(null);
   const [open, setOpen] = useState(false);
-
-  // O restante do seu código vem aqui...
-<<<<<<< HEAD
   const [form, setForm] = useState(EMPTY);
-=======
->>>>>>> 114d69d (Corrigindo build e removendo dependências problemáticas)
 
   const load = async () => {
     try {
@@ -33,19 +30,13 @@ export default function Admin() {
 
   const openNew = () => {
     setEditing(null);
-<<<<<<< HEAD
     setForm(EMPTY);
-=======
->>>>>>> 114d69d (Corrigindo build e removendo dependências problemáticas)
     setOpen(true);
   };
 
   const openEdit = (p) => {
     setEditing(p);
-<<<<<<< HEAD
     setForm(p);
-=======
->>>>>>> 114d69d (Corrigindo build e removendo dependências problemáticas)
     setOpen(true);
   };
 
@@ -85,8 +76,4 @@ export default function Admin() {
       </Dialog>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 114d69d (Corrigindo build e removendo dependências problemáticas)
