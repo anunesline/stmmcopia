@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
   useEffect(() => { checkAuth(); }, [checkAuth]);
 
   const login = async (email, password) => {
-    const r = await api.post('/auth/login', { email, password });
+    const r = await api.post('/login', { email, password });
     localStorage.setItem('mm_token', r.data.session_token);
     setUser(r.data.user);
     return r.data.user;
