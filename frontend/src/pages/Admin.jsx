@@ -6,8 +6,6 @@ import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
-const EMPTY = { name: '', description: '', image: '', category: '', is_featured: false };
-
 export default function Admin() {
   const { user, loading, logout } = useAuth();
   const [products, setProducts] = useState([]);
