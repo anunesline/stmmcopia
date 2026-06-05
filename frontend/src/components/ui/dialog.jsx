@@ -94,7 +94,7 @@ export {
 }
 <DialogContent>
   <DialogHeader>
-    <DialogTitle>{editing ? 'Editar produto' : 'Novo produto'}</DialogTitle>
+    <DialogTitle>Gerenciar Produto</DialogTitle>
     {/* Adicione esta linha para silenciar o aviso */}
     <span className="sr-only">Formulário para gerenciar produtos da loja</span>
   </DialogHeader>
