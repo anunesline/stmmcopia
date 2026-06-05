@@ -69,14 +69,12 @@ export default function Admin() {
   };
 
   
-  const save = async () => {
-    // Validação flexível: aceita a imagem que já está no form (carregada do banco ou via upload)
+const save = async () => {
+    // Validação
     if (!form.name || !form.category || !form.image) {
       toast.error('Preencha nome, foto e categoria');
-     return (
-  <div className="p-10">
-    <h1 className="text-4xl text-black">TESTE DE CARGA</h1>
-    <p>Se você está vendo isso, o React funcionou!</p>
-  </div>
-);
+      return; // Apenas saia da função aqui
     }
+
+    // O restante do seu código de salvar vem aqui embaixo...
+  };
