@@ -11,20 +11,14 @@ export default function Catalog() {
 
   const cat = params.get('category') || '';
 
-  // Efeito isolado para categorias
+  // 1. Busca Categorias
   useEffect(() => {
-    console.log("Tentando buscar categorias...");
     api.get('/categories')
-      .then((r) => {
-        console.log("Categorias carregadas com sucesso:", r.data);
-        setCategories(Array.isArray(r.data) ? r.data : []);
-      })
-      .catch((err) => {
-        console.error("Erro fatal ao buscar categorias:", err);
-      });
+      .then((r) => setCategories(Array.isArray(r.data) ? r.data : []))
+      .catch((err) => console.error("Erro ao buscar categorias:", err));
   }, []);
 
-  // Efeito isolado para produtos
+  // 2. Busca Produtos
   useEffect(() => {
     setLoading(true);
     const url = cat ? `/products?category=${cat}` : '/products';
@@ -38,23 +32,37 @@ export default function Catalog() {
     <div className="max-w-7xl mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-8">Catálogo</h1>
 
+      {/* Menu de Categorias */}
       <div className="flex gap-4 mb-10 overflow-x-auto pb-2">
-        <Link to="/produtos" className="px-4 py-2 rounded-full border bg-gray-200">Todos</Link>
-        {categories.map((c, i) => {
-          const name = c.name || c.title || c;
-          return (
-            <Link key={i} to={`/produtos?category=${name}`} className="px-4 py-2 rounded-full border hover:bg-gray-100 whitespace-nowrap">
-              {name}
-            </Link>
-          );
-        })}
+        <Link 
+          to="/produtos" 
+          className={`px-4 py-2 rounded-full border transition-colors ${!cat ? 'bg-[#0B2861] text-white' : 'hover:bg-gray-100'}`}
+        >
+          Todos
+        </Link>
+        {categories.map((c) => (
+          <Link
+            key={c.category_id}
+            to={`/produtos?category=${c.slug}`}
+            className={`px-4 py-2 rounded-full border transition-colors whitespace-nowrap ${cat === c.slug ? 'bg-[#0B2861] text-white' : 'hover:bg-gray-100'}`}
+          >
+            {c.name}
+          </Link>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {products.map((p) => <ProductCard key={p.product_id} product={p} />)}
-      </div>
+      {/* Grid de Produtos */}
+      {loading ? (
+        <p>Carregando produtos...</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.map((p) => <ProductCard key={p.product_id} product={p} />)}
+        </div>
+      )}
       
-      {!loading && products.length === 0 && <p>Nenhum produto encontrado.</p>}
+      {!loading && products.length === 0 && (
+        <p className="text-center py-20 text-gray-500">Nenhum produto encontrado nesta categoria.</p>
+      )}
     </div>
   );
 }
