@@ -13,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     // Chamada da API corrigida para a rota de destaques
-    api.get('api/products/featured')
+    api.get('/products/featured')
       .then((r) => setFeatured(Array.isArray(r.data) ? r.data : []))
       .catch(() => setFeatured([]));
 
