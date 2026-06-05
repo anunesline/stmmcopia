@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = "https://stmm-ao45.onrender.com";
+const BASE_URL = "https://stmm-ao45.onrender.com/api";
 
 export const api = axios.create({
   baseURL: BASE_URL,
