@@ -11,6 +11,8 @@ export default function Admin() {
   const [products, setProducts] = useState([]);
   const [editing, setEditing] = useState(null);
   const [open, setOpen] = useState(false);
+
+  // O restante do seu código vem aqui...
 <<<<<<< HEAD
   const [form, setForm] = useState(EMPTY);
 =======
