@@ -43,7 +43,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-api = APIRouter(prefix="/api")
+api = APIRouter()
 
 
 # ==================== HELPERS ====================
@@ -200,7 +200,7 @@ async def seed():
 
 
 # ==================== ROUTER ====================
-app.include_router(api)
+app.include_router(api, prefix="/api")
 
 
 # ==================== ROOT ====================
