@@ -1,29 +1,22 @@
-# Pastas e arquivos de dependências
+# node
 node_modules/
-.pnp
-.pnp.js
 
-# Build e Produção
-!frontend/build/
+# build
 dist/
-*.tsbuildinfo
+build/
 
-# IDE e sistema
-.idea/
-.vscode/
-.DS_Store
-
-# Logs e Debug
-*.log
-.cache/
-
-# Variáveis de ambiente
+# env
 .env
-.env.local
 .env.*
-*.json
-!package.json
-!package-lock.json
 
-# Cache do Git (Essencial)
-.eslintcache
+# python
+__pycache__/
+*.pyc
+
+# logs
+*.log
+
+# ide
+.vscode/
+.idea/
+.DS_Store
