@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = "http://127.0.0.1:8000/api";
+const BASE_URL = "https://stmmcopia.onrender.com/api?v=2";
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -31,5 +31,5 @@ export const resolveImg = (url) => {
   
   const cleanUrl = url.startsWith('/') ? url : `/${url}`;
   // Garantimos que o caminho de arquivos não duplique o /api
-  return `https://stmm-ao45.onrender.com/api/files${cleanUrl}`.replace(/\/api\/api/g, '/api');
+  return `https://stmmcopia.onrender.com/api/files${cleanUrl}`.replace(/\/api\/api/g, '/api');
 };
