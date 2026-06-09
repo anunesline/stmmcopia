@@ -37,7 +37,12 @@ app = FastAPI(title="STMM API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://www.mmdistribuidora.com.br",
+        "https://mmdistribuidora.com.br",
+        ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
