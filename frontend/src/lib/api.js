@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = "https://stmmcopia.onrender.com/api?v=2";
+const BASE_URL = "https://stmmcopia.onrender.com/api";
 
 export const api = axios.create({
   baseURL: BASE_URL,
