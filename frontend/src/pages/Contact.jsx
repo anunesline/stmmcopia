@@ -36,7 +36,7 @@ export default function Contact() {
                 <Clock className="w-5 h-5 text-[#7DD3FC] mt-0.5" />
                 <div>
                   <div className="text-[10px] uppercase tracking-[0.2em] text-sky-300 mb-1">Horário</div>
-                  <div>Segunda a sexta · 9h às 18h</div>
+                  <div>Segunda a sexta · 9h às 13h</div>
                   <div>Sábado · 9h às 13h</div>
                 </div>
               </li>
