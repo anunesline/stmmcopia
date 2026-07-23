@@ -10,8 +10,7 @@ export default function About() {
         <span className="text-[#0EA5E9]">Limpeza · Descartáveis · Papéis</span>
       </h1>
       <p className="text-lg text-slate-600 leading-relaxed max-w-2xl mb-12">
-        Há mais de 20 anos atendendo empresas, condomínios, escolas e residências em Pinhais, Curitiba
-        e região metropolitana com qualidade, preço justo e entrega rápida. Trabalhamos com as melhores
+        Trabalhamos com as melhores
         marcas do mercado e oferecemos atendimento próximo, direto pelo WhatsApp.
       </p>
 

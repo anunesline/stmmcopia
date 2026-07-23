@@ -1,13 +1,28 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import {
+  MessageCircle,
+  ShoppingCart,
+} from 'lucide-react';
+
 import { Button } from './ui/button';
 import { buildWhatsAppUrl } from './WhatsAppWidget';
 import { resolveImg } from '../lib/api';
 
-export default function ProductCard({ product, number = '554134032999' }) {
-  if (!product) return null;
+const NUVEMSHOP_URL =
+  'https://mmdistribuidoradelimpeza.lojavirtualnuvem.com.br/';
 
-  const wppUrl = buildWhatsAppUrl({ number, product: product.name });
+export default function ProductCard({
+  product,
+  number = '554134032999',
+}) {
+  if (!product) {
+    return null;
+  }
+
+  const wppUrl = buildWhatsAppUrl({
+    number,
+    product: product.name,
+  });
 
   return (
     <div
@@ -21,24 +36,43 @@ export default function ProductCard({ product, number = '554134032999' }) {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
+
       <div className="p-4 flex flex-col flex-1">
         <h3 className="font-display text-lg text-[#0B2861] leading-tight">
           {product.name}
         </h3>
+
         <p className="text-xs text-slate-500 mt-2 leading-relaxed line-clamp-3 flex-1">
           {product.description}
         </p>
-        <a
-          href={wppUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid={`quero-${product.product_id}`}
-          className="mt-4"
-        >
-          <Button className="w-full h-10 bg-[#25D366] hover:bg-[#1ebe57] text-white gap-2 text-sm">
-            Quero este produto <ArrowRight className="w-4 h-4" />
-          </Button>
-        </a>
+
+        <div className="mt-4 space-y-2">
+          <a
+            href={NUVEMSHOP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid={`comprar-${product.product_id}`}
+            className="block"
+          >
+            <Button className="w-full h-10 bg-[#F59E0B] hover:bg-[#D97706] text-white gap-2 text-sm">
+              <ShoppingCart className="w-4 h-4" />
+              Comprar online
+            </Button>
+          </a>
+
+          <a
+            href={wppUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid={`orcamento-${product.product_id}`}
+            className="block"
+          >
+            <Button className="w-full h-10 bg-[#25D366] hover:bg-[#1ebe57] text-white gap-2 text-sm">
+              <MessageCircle className="w-4 h-4" />
+              Solicitar orçamento
+            </Button>
+          </a>
+        </div>
       </div>
     </div>
   );
