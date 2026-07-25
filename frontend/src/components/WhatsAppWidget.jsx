@@ -1,19 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { api } from '../lib/api';
+
+import { SITE } from '../config/site';
 
 const DEFAULT_MSG = 'Oi! Vi o site e gostaria de informações.';
 
-export function buildWhatsAppUrl({ number = '554134032999', name = '', phone = '', message = DEFAULT_MSG, product = '' } = {}) {
+export function buildWhatsAppUrl({
+  number = SITE.whatsapp,
+  name = '',
+  phone = '',
+  message = DEFAULT_MSG,
+  product = '',
+} = {}) {
   const parts = [];
-  if (name) parts.push(`Oi! Meu nome é ${name}.`);
-  if (product) parts.push(`Tenho interesse no produto: ${product}.`);
+
+  if (name) {
+    parts.push(`Oi! Meu nome é ${name}.`);
+  }
+
+  if (product) {
+    parts.push(`Tenho interesse no produto: ${product}.`);
+  }
+
   parts.push(message || DEFAULT_MSG);
-  if (phone) parts.push(`Telefone: ${phone}`);
+
+  if (phone) {
+    parts.push(`Telefone: ${phone}`);
+  }
+
   const text = parts.join('\n');
+
   return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 }
 
@@ -22,74 +41,102 @@ export default function WhatsAppWidget() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState(DEFAULT_MSG);
-  const [loading, setLoading] = useState(false);
-  const [number, setNumber] = useState('554134032999');
 
-  useEffect(() => {
-    api.get('/settings').then((r) => setNumber(r.data.whatsapp_number)).catch(() => {});
-  }, []);
-
-  const send = async () => {
-    if (!message.trim()) return;
-    setLoading(true);
-    try {
-      const r = await api.post('/chat/whatsapp', { name, phone, message });
-      window.open(r.data.whatsapp_url, '_blank');
-      setOpen(false);
-    } catch {
-      window.open(buildWhatsAppUrl({ number, name, phone, message }), '_blank');
-    } finally {
-      setLoading(false);
+  const send = () => {
+    if (!message.trim()) {
+      return;
     }
+
+    window.open(
+      buildWhatsAppUrl({
+        name,
+        phone,
+        message,
+      }),
+      '_blank',
+      'noopener,noreferrer'
+    );
+
+    setOpen(false);
   };
 
   const quickOpen = () => {
-    window.open(buildWhatsAppUrl({ number }), '_blank');
+    window.open(
+      buildWhatsAppUrl(),
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-50" data-testid="whatsapp-widget">
+    <div
+      className="fixed bottom-5 right-5 z-50"
+      data-testid="whatsapp-widget"
+    >
       {open && (
-        <div className="absolute bottom-20 right-0 w-[340px] sm:w-[380px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-fade-up">
+        <div className="absolute bottom-20 right-0 w-[340px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl animate-fade-up sm:w-[380px]">
           <div className="bg-gradient-to-r from-[#0B2861] to-[#0EA5E9] p-4 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-display text-lg">Fale com a MM</div>
-                <div className="text-xs text-sky-100">Atendimento direto pelo WhatsApp</div>
+                <div className="font-display text-lg">
+                  Fale com a MM
+                </div>
+
+                <div className="text-xs text-sky-100">
+                  Atendimento direto pelo WhatsApp
+                </div>
               </div>
-              <button onClick={() => setOpen(false)} data-testid="close-chat-btn" className="p-1 hover:bg-white/10 rounded">
-                <X className="w-4 h-4" />
+
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                data-testid="close-chat-btn"
+                className="rounded p-1 transition-colors hover:bg-white/10"
+                aria-label="Fechar atendimento"
+              >
+                <X className="h-4 w-4" />
               </button>
             </div>
           </div>
-          <div className="p-4 space-y-3">
+
+          <div className="space-y-3 p-4">
             <Input
               data-testid="chat-name-input"
               placeholder="Seu nome (opcional)"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(event) => setName(event.target.value)}
             />
+
             <Input
               data-testid="chat-phone-input"
               placeholder="Seu telefone (opcional)"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(event) => setPhone(event.target.value)}
             />
+
             <Textarea
               data-testid="chat-message-input"
               rows={3}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(event) => setMessage(event.target.value)}
             />
+
             <Button
+              type="button"
               data-testid="chat-send-btn"
               onClick={send}
-              disabled={loading}
-              className="w-full bg-[#25D366] hover:bg-[#1ebe57] text-white gap-2 h-11"
+              className="h-11 w-full gap-2 bg-[#25D366] text-white hover:bg-[#1ebe57]"
             >
-              <Send className="w-4 h-4" /> {loading ? 'Abrindo...' : 'Continuar no WhatsApp'}
+              <Send className="h-4 w-4" />
+              Continuar no WhatsApp
             </Button>
-            <button onClick={quickOpen} data-testid="quick-wpp-btn" className="text-xs text-[#0EA5E9] underline w-full text-center">
+
+            <button
+              type="button"
+              onClick={quickOpen}
+              data-testid="quick-wpp-btn"
+              className="w-full text-center text-xs text-[#0EA5E9] underline"
+            >
               Ou abrir conversa diretamente
             </button>
           </div>
@@ -97,13 +144,17 @@ export default function WhatsAppWidget() {
       )}
 
       <button
+        type="button"
         data-testid="whatsapp-fab"
-        onClick={() => setOpen((v) => !v)}
-        className="group flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe57] text-white shadow-2xl transition-all hover:scale-105 active:scale-95 rounded-full pl-4 pr-5 h-14"
+        onClick={() => setOpen((currentValue) => !currentValue)}
+        className="group flex h-14 items-center gap-2 rounded-full bg-[#25D366] pl-4 pr-5 text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#1ebe57] active:scale-95"
         aria-label="Fale no WhatsApp"
       >
-        <MessageCircle className="w-6 h-6" />
-        <span className="font-semibold hidden sm:inline">Fale no WhatsApp</span>
+        <MessageCircle className="h-6 w-6" />
+
+        <span className="hidden font-semibold sm:inline">
+          Fale no WhatsApp
+        </span>
       </button>
     </div>
   );

@@ -137,10 +137,8 @@ export default function Footer() {
 
       <div className="border-t border-white/10 py-5 text-center text-xs text-slate-400">
         © {new Date().getFullYear()} MM Comércio e Distribuidora · Todos os
-        direitos reservados. ·{' '}
-        <Link to="/admin" className="hover:text-sky-300">
-          Admin
-        </Link>
+        direitos reservados.
+    
       </div>
     </footer>
   );

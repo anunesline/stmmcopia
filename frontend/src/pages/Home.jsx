@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowUpRight,
@@ -11,10 +11,9 @@ import {
 
 import { Button } from '../components/ui/button';
 import { buildWhatsAppUrl } from '../components/WhatsAppWidget';
-import { api } from '../lib/api';
+import { SITE } from '../config/site';
 
-const NUVEMSHOP_URL =
-  'https://mmdistribuidoradelimpeza.lojavirtualnuvem.com.br/';
+const NUVEMSHOP_URL = SITE.loja;
 
 const cardVariants = {
   hidden: {
@@ -126,20 +125,7 @@ function buildBrandUrl(searchTerm) {
 }
 
 export default function Home() {
-  const [number, setNumber] = useState('554134032999');
-
-  useEffect(() => {
-    api
-      .get('/settings')
-      .then((response) => {
-        if (response.data?.whatsapp_number) {
-          setNumber(response.data.whatsapp_number);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const heroWpp = buildWhatsAppUrl({ number });
+  const heroWpp = buildWhatsAppUrl();
 
   const benefits = [
     {
