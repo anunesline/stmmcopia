@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
+  ArrowUpRight,
   CheckCircle,
   MessageCircle,
   ShoppingCart,
@@ -9,7 +10,6 @@ import {
 } from 'lucide-react';
 
 import { Button } from '../components/ui/button';
-import ProductCard from '../components/ProductCard';
 import { buildWhatsAppUrl } from '../components/WhatsAppWidget';
 import { api } from '../lib/api';
 
@@ -25,27 +25,110 @@ const cardVariants = {
     opacity: 1,
     x: 0,
     transition: {
-      delay: 0.30 * index,
+      delay: 0.3 * index,
       duration: 0.9,
       ease: [0.16, 1, 0.3, 1],
     },
   }),
 };
 
+const brandVariants = {
+  hidden: {
+    opacity: 0,
+    y: 28,
+  },
+  visible: (index) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: 0.06 * index,
+      duration: 0.55,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  }),
+};
+
+const featuredBrands = [
+  {
+    name: 'Start',
+    searchTerm: 'Start',
+    logo: '/images/brands/start.jpg',
+  },
+  {
+    name: 'Azulim',
+    searchTerm: 'Azulim',
+    logo: '/images/brands/azulim.png',
+  },
+  {
+    name: 'Deoline',
+    searchTerm: 'Deoline',
+    logo: '/images/brands/deoline.jpg',
+  },
+  {
+    name: 'Premisse',
+    searchTerm: 'Premisse',
+    logo: '/images/brands/premisse.jpg',
+  },
+  {
+    name: 'Zip',
+    searchTerm: 'Zip',
+    logo: null,
+  },
+  {
+    name: 'Verplast',
+    searchTerm: 'Verplast',
+    logo: '/images/brands/verplast.png',
+  },
+  {
+    name: 'Bompack',
+    searchTerm: 'Bompack',
+    logo: '/images/brands/bompack.png',
+  },
+  {
+    name: 'Pinicão',
+    searchTerm: 'Pinicão',
+    logo: '/images/brands/pinicao.webp',
+  },
+  {
+    name: 'Super Safety',
+    searchTerm: 'Super Safety',
+    logo: '/images/brands/super-safety.jpg',
+  },
+  {
+    name: 'Clarilimp',
+    searchTerm: 'Clarilimp',
+    logo: '/images/brands/clarilimp.jpg',
+  },
+  {
+    name: 'Claralux',
+    searchTerm: 'Claralux',
+    logo: '/images/brands/claralux.jpg',
+  },
+  {
+    name: 'Aquafast',
+    searchTerm: 'Aquafast',
+    logo: '/images/brands/aquafast.jpg',
+  },
+  {
+    name: 'Fiel Papéis',
+    searchTerm: 'Fiel Papéis',
+    logo: '/images/brands/fiel-papeis.png',
+  },
+  {
+    name: 'Via Aroma',
+    searchTerm: 'Via Aroma',
+    logo: '/images/brands/via-aroma.png',
+  },
+];
+
+function buildBrandUrl(searchTerm) {
+  return `${NUVEMSHOP_URL}search/?q=${encodeURIComponent(searchTerm)}`;
+}
+
 export default function Home() {
-  const [featured, setFeatured] = useState([]);
   const [number, setNumber] = useState('554134032999');
 
   useEffect(() => {
-    api
-      .get('/products/featured')
-      .then((response) => {
-        setFeatured(Array.isArray(response.data) ? response.data : []);
-      })
-      .catch(() => {
-        setFeatured([]);
-      });
-
     api
       .get('/settings')
       .then((response) => {
@@ -188,30 +271,65 @@ export default function Home() {
         </div>
       </section>
 
-      {/* DESTAQUES */}
+      {/* MARCAS EM DESTAQUE */}
       <section className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
-        <div className="flex items-end justify-between mb-4 flex-wrap gap-4">
+        <div className="mb-10">
           <h2 className="font-display text-3xl lg:text-5xl text-[#0B2861]">
-            Produtos em destaque
+            Encontre sua marca favorita
           </h2>
         </div>
 
-        <p className="text-slate-600 max-w-2xl mb-10">
-          Conheça alguns dos produtos mais procurados pelos nossos clientes.
-          Para visualizar o catálogo completo e realizar sua compra, acesse
-          nossa Loja Online.
-        </p>
-
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5"
-          data-testid="featured-grid"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-4"
+          data-testid="featured-brands-grid"
         >
-          {featured.map((product) => (
-            <ProductCard
-              key={product.product_id}
-              product={product}
-              number={number}
-            />
+          {featuredBrands.map((brand, index) => (
+            <motion.a
+              key={brand.name}
+              href={buildBrandUrl(brand.searchTerm)}
+              target="_blank"
+              rel="noopener noreferrer"
+              custom={index}
+              variants={brandVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{
+                once: true,
+                amount: 0.15,
+              }}
+              whileHover={{
+                y: -5,
+              }}
+              data-testid={`brand-${brand.name
+                .toLowerCase()
+                .replace(/\s+/g, '-')}`}
+              aria-label={`Ver produtos da marca ${brand.name}`}
+              className="group flex min-h-[190px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-sky-400 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:ring-offset-2"
+            >
+              <div className="flex min-h-[118px] flex-1 items-center justify-center rounded-xl bg-white px-2 py-3">
+                {brand.logo ? (
+                  <img
+                    src={brand.logo}
+                    alt={`Logo ${brand.name}`}
+                    loading="lazy"
+                    className="max-h-[98px] w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-[98px] w-full items-center justify-center rounded-xl bg-slate-50">
+                    <span className="font-display text-4xl tracking-wide text-[#0B2861]">
+                      ZIP
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 border-t border-slate-100 pt-3">
+                <span className="inline-flex items-center gap-1 text-sm font-semibold text-slate-500 transition-colors duration-300 group-hover:text-[#0EA5E9]">
+                  Ver produtos
+                  <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </div>
+            </motion.a>
           ))}
         </div>
       </section>
