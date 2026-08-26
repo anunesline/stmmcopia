@@ -1,4 +1,10 @@
 {
+  "redirects": [
+    { "source": "/category/:path*", "destination": "/produtos", "permanent": true },
+    { "source": "/product-page/:path*", "destination": "/produtos", "permanent": true },
+    { "source": "/search", "destination": "/produtos", "permanent": true },
+    { "source": "/about-4", "destination": "/sobre", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/((?!api/).*)",
