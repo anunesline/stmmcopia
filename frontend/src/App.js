@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import SocialFloat from './components/SocialFloat';
+import SEO from './components/SEO';
 
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
@@ -15,6 +16,7 @@ import Contact from './pages/Contact';
 function AppRouter() {
   return (
     <>
+      <SEO />
       <Header />
 
       <main className="min-h-[60vh]">
