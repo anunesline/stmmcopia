@@ -21,16 +21,18 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-12 grid md:grid-cols-3 gap-10">
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <img
-              src="/logo-mm.png"
-              alt="MM Distribuidora de Limpeza"
-              className="h-16 w-auto object-contain"
-            />
+            <div className="bg-white rounded-lg px-3 py-2">
+              <img
+                src="/logo-mm.png"
+                alt="MM Distribuidora de Limpeza"
+                className="h-16 w-auto object-contain"
+              />
+            </div>
           </div>
 
           <p className="text-sm text-slate-300 leading-relaxed">
-            Há mais de 20 anos abastecendo empresas, condomínios e indústrias
-            com produtos de limpeza, descartáveis e papéis de qualidade.
+            Abastecendo empresas, condomínios e indústrias com produtos de
+            limpeza, descartáveis e papéis de qualidade.
           </p>
 
           <div className="flex gap-3 mt-5">
