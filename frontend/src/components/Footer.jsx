@@ -21,13 +21,11 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-12 grid md:grid-cols-3 gap-10">
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <div className="bg-white p-2 rounded-lg">
-              <img
-                src="https://customer-assets.emergentagent.com/job_macro-supply-store/artifacts/z4sqbavk_1000115145_page-0001.jpg"
-                alt="MM Comércio e Distribuidora"
-                className="h-10 w-auto object-contain mix-blend-multiply"
-              />
-            </div>
+            <img
+              src="/logo-mm.png"
+              alt="MM Distribuidora de Limpeza"
+              className="h-14 w-auto object-contain"
+            />
 
             <div>
               <div className="font-display text-lg">
@@ -125,7 +123,7 @@ export default function Footer() {
             </li>
 
             <li className="flex gap-2">
-              <MapPin className="w-4 h-4 text-sky-300 mt-0.5 flex-shrink-0" />
+              <MapPin className="w-4 h-4 text-sky-300 mt-1 flex-shrink-0" />
 
               <span>
                 R. Rio Trombetas, 493 — Weissópolis, Pinhais — PR · 83322-280
