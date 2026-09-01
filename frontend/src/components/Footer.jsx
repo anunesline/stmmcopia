@@ -24,18 +24,8 @@ export default function Footer() {
             <img
               src="/logo-mm.png"
               alt="MM Distribuidora de Limpeza"
-              className="h-14 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
-
-            <div>
-              <div className="font-display text-lg">
-                MM Comércio e Distribuidora
-              </div>
-
-              <div className="text-[10px] uppercase tracking-[0.18em] text-sky-300">
-                Limpeza · Descartáveis · Papéis
-              </div>
-            </div>
           </div>
 
           <p className="text-sm text-slate-300 leading-relaxed">
@@ -136,7 +126,6 @@ export default function Footer() {
       <div className="border-t border-white/10 py-5 text-center text-xs text-slate-400">
         © {new Date().getFullYear()} MM Comércio e Distribuidora · Todos os
         direitos reservados.
-    
       </div>
     </footer>
   );
