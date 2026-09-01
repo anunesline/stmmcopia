@@ -3,7 +3,7 @@ import { Instagram, Facebook } from 'lucide-react';
 
 export default function SocialFloat() {
   const items = [
-    { href: 'https://www.instagram.com/redemmdistribuidoras', icon: Instagram, label: 'Instagram', test: 'social-instagram' },
+    { href: 'https://www.instagram.com/mmdistribuidoradelimpeza', icon: Instagram, label: 'Instagram', test: 'social-instagram' },
     { href: 'https://www.facebook.com/redemmdistribuidoras', icon: Facebook, label: 'Facebook', test: 'social-facebook' },
   ];
 
