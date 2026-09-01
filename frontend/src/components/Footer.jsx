@@ -47,7 +47,7 @@ export default function Footer() {
 
           <div className="flex gap-3 mt-5">
             <a
-              href="https://www.instagram.com/redemmdistribuidoras"
+              href="https://www.instagram.com/mmdistribuidoradelimpeza"
               target="_blank"
               rel="noopener noreferrer"
               className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#0EA5E9] flex items-center justify-center transition-colors"
