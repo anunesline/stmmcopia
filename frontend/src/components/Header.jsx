@@ -28,9 +28,9 @@ export default function Header() {
           className="flex items-center gap-3"
         >
           <img
-            src="https://customer-assets.emergentagent.com/job_macro-supply-store/artifacts/z4sqbavk_1000115145_page-0001.jpg"
-            alt="MM Comércio e Distribuidora"
-            className="h-12 w-auto object-contain mix-blend-multiply"
+            src="/logo-mm.png"
+            alt="MM Distribuidora de Limpeza"
+            className="h-12 w-auto object-contain"
           />
 
           <div className="leading-tight">
