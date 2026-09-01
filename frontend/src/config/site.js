@@ -9,7 +9,7 @@ export const SITE = {
     'https://mmdistribuidoradelimpeza.lojavirtualnuvem.com.br/',
 
   instagram:
-    'https://www.instagram.com/redemmdistribuidoras',
+    'https://www.instagram.com/mmdistribuidoradelimpeza',
 
   facebook:
     'https://www.facebook.com/redemmdistribuidoras',
