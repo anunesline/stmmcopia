@@ -30,7 +30,7 @@ export default function Header() {
           <img
             src="/logo-mm.png"
             alt="MM Distribuidora de Limpeza"
-            className="h-12 w-auto object-contain"
+            className="h-16 w-auto object-contain"
           />
 
           <div className="leading-tight">
