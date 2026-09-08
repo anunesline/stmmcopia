@@ -135,7 +135,7 @@ export default function Home() {
       icon: Truck,
     },
     {
-      title: 'Mais de 500 produtos',
+      title: 'Mais de 1000 produtos',
       description:
         'Linha completa de produtos de limpeza, descartáveis e papéis.',
       icon: ShoppingCart,
@@ -170,7 +170,7 @@ export default function Home() {
             <div className="space-y-2.5 text-base sm:text-lg">
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-5 h-5 text-[#22C55E] flex-shrink-0" />
-                <span>Mais de 500 produtos</span>
+                <span>Mais de 1000 produtos</span>
               </div>
 
               <div className="flex items-center gap-3">
