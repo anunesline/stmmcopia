@@ -185,7 +185,7 @@ export default function Home() {
             </div>
 
             <p className="text-slate-200 max-w-xl text-base sm:text-lg leading-relaxed">
-              Encontre tudo o que você precisa para sua casa, empresa ou
+              A MM é sua distribuidora de produtos de limpeza para casa, empresa ou
               condomínio, com atendimento em Pinhais, Curitiba e região.
             </p>
 
