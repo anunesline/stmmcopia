@@ -5,8 +5,8 @@ const BASE_URL = 'https://www.mmdistribuidora.com.br';
 
 const SEO_BY_PATH = {
   '/': {
-    title: 'Produtos de Limpeza em Pinhais | MM Distribuidora',
-    description: 'MM Distribuidora: produtos de limpeza e saneantes em Pinhais, Curitiba e região. Compre online com variedade, atendimento e entrega rápida.',
+    title: 'Distribuidora de Produtos de Limpeza em Pinhais | MM',
+    description: 'Distribuidora de produtos de limpeza em Pinhais, com atendimento em Curitiba e região. Produtos para casas, empresas e condomínios. Confira a MM.',
   },
   '/produtos': {
     title: 'Produtos de Limpeza em Pinhais | MM Distribuidora',
