@@ -158,8 +158,8 @@ export default function Home() {
           <div className="lg:col-span-7 space-y-5 animate-fade-up">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-[54px] leading-[1.04] text-[#7DD3FC]">
               <span className="lg:whitespace-nowrap">
-                Tudo para{' '}
-                <span className="text-white">limpeza,</span>
+                Produtos de{' '}
+                <span className="text-white">limpeza em Pinhais,</span>
               </span>
 
               <br />
@@ -186,7 +186,7 @@ export default function Home() {
 
             <p className="text-slate-200 max-w-xl text-base sm:text-lg leading-relaxed">
               Encontre tudo o que você precisa para sua casa, empresa ou
-              condomínio.
+              condomínio, com atendimento em Pinhais, Curitiba e região.
             </p>
 
             <div className="flex flex-wrap gap-3">

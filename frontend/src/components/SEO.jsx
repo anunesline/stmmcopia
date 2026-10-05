@@ -9,8 +9,8 @@ const SEO_BY_PATH = {
     description: 'MM Distribuidora: produtos de limpeza e saneantes em Pinhais, Curitiba e região. Compre online com variedade, atendimento e entrega rápida.',
   },
   '/produtos': {
-    title: 'Produtos de Limpeza | MM Distribuidora',
-    description: 'Encontre produtos de limpeza, higiene, descartáveis e papéis na MM Distribuidora. Consulte as categorias e compre online.',
+    title: 'Produtos de Limpeza em Pinhais | MM Distribuidora',
+    description: 'Produtos de limpeza, higiene, descartáveis, papéis, EPIs e equipamentos em Pinhais, Curitiba e região. Confira as categorias da MM Distribuidora.',
   },
   '/sobre': {
     title: 'Sobre a MM Distribuidora | Produtos de Limpeza',

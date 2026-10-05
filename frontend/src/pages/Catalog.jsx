@@ -111,11 +111,16 @@ export default function Catalog() {
           className="text-center"
         >
           <h1 className="font-display text-3xl text-[#0B2861] lg:text-4xl">
-            O que você{' '}
+            Produtos de limpeza{' '}
             <span className="text-[#0EA5E9]">
-              procura?
+              em Pinhais
             </span>
           </h1>
+        <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-slate-600">
+            Encontre produtos de limpeza, higiene, descartáveis, papéis, EPIs e
+            equipamentos para sua casa, empresa ou condomínio em Pinhais,
+            Curitiba e região.
+          </p>
         </motion.div>
       </section>
 
